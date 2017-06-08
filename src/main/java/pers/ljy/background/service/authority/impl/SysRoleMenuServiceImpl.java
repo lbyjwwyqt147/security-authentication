@@ -1,5 +1,6 @@
 package pers.ljy.background.service.authority.impl;
 
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,11 @@ public class SysRoleMenuServiceImpl extends BaseServiceImpl<SysRoleMenuEntity, I
 	@Override
 	public CopyOnWriteArrayList<SysRoleMenuEntity> selectRoleMenuByRoleId(Integer roleId) {
 		return this.sysRoleMenuDao.selectRoleMenuByRoleId(roleId);
+	}
+
+	@Override
+	public CopyOnWriteArrayList<SysRoleMenuEntity> selectRoleMenuByRoleIdIn(List<Integer> roleIds) {
+		return this.sysRoleMenuDao.selectRoleMenuByRoleIdIn(roleIds);
 	}
 
 

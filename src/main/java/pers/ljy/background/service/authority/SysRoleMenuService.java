@@ -1,6 +1,7 @@
 package pers.ljy.background.service.authority;
 
 
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import pers.ljy.background.model.SysRoleMenuEntity;
@@ -25,4 +26,11 @@ public interface SysRoleMenuService extends BaseService<SysRoleMenuEntity, Integ
 	 * @return
 	 */
 	CopyOnWriteArrayList<SysRoleMenuEntity> selectRoleMenuByRoleId(Integer roleId);
+	
+	/**
+	 * 根据一组角色ID获取角色菜单资源
+	 * @param roleIds 角色ID
+	 * @return
+	 */
+	CopyOnWriteArrayList<SysRoleMenuEntity> selectRoleMenuByRoleIdIn(List<Integer> roleIds);
 }

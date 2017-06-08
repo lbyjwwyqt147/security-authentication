@@ -2,6 +2,7 @@ package pers.ljy.background.service.user;
 
 import pers.ljy.background.model.SysUsersAccountEntity;
 import pers.ljy.background.share.service.BaseService;
+import pers.ljy.background.web.vo.authority.UserRoleVo;
 
 /***
  * 文件名称: SysUsersAccountService.java
@@ -22,4 +23,11 @@ public interface SysUsersAccountService extends BaseService<SysUsersAccountEntit
 	 * @return
 	 */
 	SysUsersAccountEntity selectUsersAccount(String userName);
+	
+	/**
+	 * 根据用户名查询账户信息和对于的角色
+	 * @param userName  用户名
+	 * @return
+	 */
+	UserRoleVo selectUsersAccountRoles(String userName);
 }

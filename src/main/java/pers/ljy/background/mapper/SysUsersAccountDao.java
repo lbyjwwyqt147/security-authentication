@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.Mapper;
 
 import pers.ljy.background.model.SysUsersAccountEntity;
 import pers.ljy.background.share.dao.BaseDao;
+import pers.ljy.background.web.vo.authority.UserRoleVo;
 
 /***
  * 文件名称: SysUsersAccountDao.java
@@ -26,4 +27,11 @@ public interface SysUsersAccountDao extends BaseDao<SysUsersAccountEntity, Integ
 	 * @return
 	 */
 	SysUsersAccountEntity selectUsersAccount(String userName);
+	
+	/**
+	 * 根据用户名查询账户信息和对于的角色
+	 * @param userName  用户名
+	 * @return
+	 */
+	UserRoleVo selectUsersAccountRoles(String userName);
 }

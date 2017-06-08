@@ -1,6 +1,7 @@
 package pers.ljy.background.mapper;
 
 
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.ibatis.annotations.Mapper;
@@ -28,4 +29,11 @@ public interface SysRoleMenuDao extends BaseDao<SysRoleMenuEntity, Integer>{
 	 * @return
 	 */
 	CopyOnWriteArrayList<SysRoleMenuEntity> selectRoleMenuByRoleId(Integer roleId);
+	
+	/**
+	 * 根据一组角色ID获取角色菜单资源
+	 * @param roleIds 角色ID
+	 * @return
+	 */
+	CopyOnWriteArrayList<SysRoleMenuEntity> selectRoleMenuByRoleIdIn(List<Integer> roleIds);
 }

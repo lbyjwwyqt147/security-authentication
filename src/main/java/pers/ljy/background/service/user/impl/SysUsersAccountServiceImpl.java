@@ -8,6 +8,7 @@ import pers.ljy.background.model.SysUsersAccountEntity;
 import pers.ljy.background.service.user.SysUsersAccountService;
 import pers.ljy.background.share.dao.BaseDao;
 import pers.ljy.background.share.service.impl.BaseServiceImpl;
+import pers.ljy.background.web.vo.authority.UserRoleVo;
 
 @Service
 public class SysUsersAccountServiceImpl extends BaseServiceImpl<SysUsersAccountEntity, Integer> implements SysUsersAccountService {
@@ -24,6 +25,12 @@ public class SysUsersAccountServiceImpl extends BaseServiceImpl<SysUsersAccountE
 	@Override
 	public SysUsersAccountEntity selectUsersAccount(String userName) {
 		return this.sysUsersAccountDao.selectUsersAccount(userName);
+	}
+
+
+	@Override
+	public UserRoleVo selectUsersAccountRoles(String userName) {
+		return this.selectUsersAccountRoles(userName);
 	}
 
 	

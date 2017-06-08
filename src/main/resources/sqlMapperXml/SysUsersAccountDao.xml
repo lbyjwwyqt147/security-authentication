@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="pers.ljy.background.mapper.SysUsersAccountDao">
+  <!-- 帐号基础信息 -->
   <resultMap id="BaseResultMap" type="pers.ljy.background.model.SysUsersAccountEntity">
     <id column="id_" jdbcType="INTEGER" property="id" />
     <result column="user_number_" jdbcType="VARCHAR" property="userNumber" />
@@ -13,12 +14,37 @@
     <result column="salt_" jdbcType="VARCHAR" property="salt" />
     <result column="create_date_" jdbcType="TIMESTAMP" property="createDate" />
   </resultMap>
+  <!-- 用户对应的角色 -->
+  <resultMap id="UserRoleResultMap" type="pers.ljy.background.web.vo.authority.UserRoleVo">
+    <id column="id_" jdbcType="INTEGER" property="id" />
+    <result column="user_number_" jdbcType="VARCHAR" property="userNumber" />
+    <result column="user_id_" jdbcType="INTEGER" property="userId" />
+    <result column="user_name_" jdbcType="VARCHAR" property="userName" />
+    <result column="user_pwd_" jdbcType="VARCHAR" property="userPwd" />
+    <result column="account_type_" jdbcType="CHAR" property="accountType" />
+    <result column="integral_" jdbcType="BIGINT" property="integral" />
+    <result column="status_" jdbcType="CHAR" property="status" />
+    <result column="salt_" jdbcType="VARCHAR" property="salt" />
+    <result column="create_date_" jdbcType="TIMESTAMP" property="createDate" />
+    <collection property="userRoleList" column="userId" ofType="pers.ljy.background.model.SysUserRoleEntity">    
+          <id column="id_" jdbcType="INTEGER" property="id" />
+          <result column="user_id_" jdbcType="INTEGER" property="userId" />
+          <result column="role_id_" jdbcType="INTEGER" property="roleId" />   
+    </collection> 
+  </resultMap>
   <sql id="Base_Column_List" >
     id_, user_number_, user_id_, 
     user_name_, user_pwd_, account_type_, 
     integral_, status_, salt_, 
     create_date_
   </sql>
+  <sql id="USER_ROLE_Column_List" >
+    u.id_, u.user_number_, u.user_id_, 
+    u.user_name_, u.user_pwd_, u.account_type_, 
+    u.integral_, u.status_, u.salt_, 
+    u.create_date_,r.id_,r.role_id_,r.user_id_
+  </sql>
+  
   <!-- 根据主键删除数据库的记录 -->
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     delete from sys_users_account
@@ -138,5 +164,17 @@
     select
     <include refid="Base_Column_List" />
     from sys_users_account
+  </select>
+  <!-- 根据帐号获取帐号信息-->
+  <select id="selectUsersAccount" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from sys_users_account  where user_name_ = #{userName,jdbcType=VARCHAR}
+  </select>
+  <!-- 根据帐号获取帐号信息和对于的角色-->
+  <select id="selectUsersAccountRoles" resultMap="UserRoleResultMap">
+    select
+    <include refid="USER_ROLE_Column_List" />
+    from sys_users_account u,sys_user_role r where u.id_ = r.user_id_ AND u.user_name_  = #{userName,jdbcType=VARCHAR}
   </select>
 </mapper>
