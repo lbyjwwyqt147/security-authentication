@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Mapper;
 
 import pers.ljy.background.model.SysRoleMenuEntity;
 import pers.ljy.background.share.dao.BaseDao;
+import pers.ljy.background.web.vo.authority.RoleMenuVo;
 
 /***
  * 文件名称: SysRoleMenuDao.java
@@ -35,5 +36,5 @@ public interface SysRoleMenuDao extends BaseDao<SysRoleMenuEntity, Integer>{
 	 * @param roleIds 角色ID
 	 * @return
 	 */
-	CopyOnWriteArrayList<SysRoleMenuEntity> selectRoleMenuByRoleIdIn(List<Integer> roleIds);
+	CopyOnWriteArrayList<RoleMenuVo> selectRoleMenuByRoleIdIn(List<Integer> roleIds);
 }

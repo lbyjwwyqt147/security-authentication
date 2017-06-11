@@ -118,5 +118,15 @@
     <include refid="Base_Column_List" />
     from sys_role
   </select>
+  <!-- 根据一组ID 获取角色列表 -->
+  <select id="selectByPrimaryKeyIn" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from sys_role where id_ in
+    <foreach item="item" index="index" collection="list" open="(" separator="," close=")">  
+	  #{item}  
+	</foreach> 
+  </select>
+  
   
 </mapper>

@@ -2,8 +2,10 @@ package pers.ljy.background.mapper;
 
 
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import pers.ljy.background.model.SysRoleEntity;
+import pers.ljy.background.share.dao.BaseDao;
 
 /***
  * 文件名称: SysRoleDao.java
@@ -16,33 +18,12 @@ import pers.ljy.background.model.SysRoleEntity;
  * @version 1.0
  * @author ljy
  */
-public interface SysRoleDao {
+public interface SysRoleDao extends BaseDao<SysRoleEntity, Integer> {
+    
     /**
-     * 根据主键删除数据库的记录
-     * @param id
+     * 根据一组ID 获取角色列表
+     * @param ids
+     * @return
      */
-    int deleteByPrimaryKey(Integer id);
-
-    /**
-     * 插入数据库记录
-     * @param record
-     */
-    int insert(SysRoleEntity record);
-
-    /**
-     * 根据主键获取一条数据库记录
-     * @param id
-     */
-    SysRoleEntity selectByPrimaryKey(Integer id);
-
-    /**
-     * 获取全部数据库记录
-     */
-    List<SysRoleEntity> selectAll();
-
-    /**
-     * 根据主键来更新数据库记录
-     * @param record
-     */
-    int updateByPrimaryKey(SysRoleEntity record);
+	CopyOnWriteArrayList<SysRoleEntity> selectByPrimaryKeyIn(List<Integer> ids);
 }

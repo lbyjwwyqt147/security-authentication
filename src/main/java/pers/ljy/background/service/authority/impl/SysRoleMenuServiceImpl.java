@@ -11,6 +11,7 @@ import pers.ljy.background.model.SysRoleMenuEntity;
 import pers.ljy.background.service.authority.SysRoleMenuService;
 import pers.ljy.background.share.dao.BaseDao;
 import pers.ljy.background.share.service.impl.BaseServiceImpl;
+import pers.ljy.background.web.vo.authority.RoleMenuVo;
 
 @Service
 public class SysRoleMenuServiceImpl extends BaseServiceImpl<SysRoleMenuEntity, Integer> implements SysRoleMenuService {
@@ -29,7 +30,7 @@ public class SysRoleMenuServiceImpl extends BaseServiceImpl<SysRoleMenuEntity, I
 	}
 
 	@Override
-	public CopyOnWriteArrayList<SysRoleMenuEntity> selectRoleMenuByRoleIdIn(List<Integer> roleIds) {
+	public CopyOnWriteArrayList<RoleMenuVo> selectRoleMenuByRoleIdIn(List<Integer> roleIds) {
 		return this.sysRoleMenuDao.selectRoleMenuByRoleIdIn(roleIds);
 	}
 

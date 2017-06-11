@@ -1,6 +1,7 @@
 package pers.ljy.background.security;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -10,18 +11,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
 import pers.ljy.background.datasource.DataSourceAop;
+import pers.ljy.background.model.SysResourceMenusEntity;
 import pers.ljy.background.model.SysRoleEntity;
 import pers.ljy.background.model.SysRoleMenuEntity;
 import pers.ljy.background.model.SysUserRoleEntity;
 import pers.ljy.background.model.SysUsersAccountEntity;
 import pers.ljy.background.service.authority.SysRoleMenuService;
+import pers.ljy.background.service.authority.SysRoleService;
 import pers.ljy.background.service.user.SysUsersAccountService;
+import pers.ljy.background.web.vo.authority.RoleMenuVo;
 import pers.ljy.background.web.vo.authority.UserRoleVo;
 
 /***
@@ -52,6 +58,8 @@ public class MyUserDetailService implements UserDetailsService {
 	private SysUsersAccountService usersAccountService;
 	@Autowired
     private SysRoleMenuService roleMenuService;	
+	@Autowired
+	private SysRoleService roleService;
 	
 	@Override
 	public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
@@ -61,7 +69,25 @@ public class MyUserDetailService implements UserDetailsService {
 		if(usersRoleVo == null){
 			throw new UsernameNotFoundException("UserName " + userName + " not found"); 
 		}
-		return null;
+		  // 取得用户的权限
+        Collection<GrantedAuthority> grantedAuths = obtionGrantedAuthorities(usersRoleVo);
+        Set<GrantedAuthority> grantedAuthorities = new HashSet<GrantedAuthority>();
+        List<Integer> roleIdsList = new ArrayList<>();
+        for (SysUserRoleEntity role : usersRoleVo.getUserRoleList()) {
+        	roleIdsList.add(role.getRoleId());
+        }
+        CopyOnWriteArrayList<SysRoleEntity> roleEntitieList = this.roleService.selectByPrimaryKeyIn(roleIdsList);
+        for (SysRoleEntity sysRoleEntity : roleEntitieList) {
+            grantedAuthorities.add(new SimpleGrantedAuthority(sysRoleEntity.getRoleName()));
+		}
+        // 封装成spring security的user
+        User userDetail = new User(usersRoleVo.getUserName(), usersRoleVo.getUserPwd(),
+                true,//是否可用
+                true,//是否过期
+                true,//证书不过期为true
+                true,//账户未锁定为true ,
+                grantedAuths);
+        return userDetail;
 	}
 	
 	/**
@@ -70,23 +96,21 @@ public class MyUserDetailService implements UserDetailsService {
 	 * @return
 	 */
     private Set<GrantedAuthority> obtionGrantedAuthorities(UserRoleVo usersRoleVo) {
-        CopyOnWriteArrayList<SysRoleMenuEntity> resources = new CopyOnWriteArrayList<>();
+        Set<GrantedAuthority> authSet = new HashSet<GrantedAuthority>();
         //获取用户的角色
         Set<SysUserRoleEntity> roles = usersRoleVo.getUserRoleList();
-        List<Integer> roleIds =  new ArrayList<>();
+        CopyOnWriteArrayList<Integer> roleIds =  new CopyOnWriteArrayList<>();
         for (SysUserRoleEntity role : roles) {
         	roleIds.add(role.getRoleId());
         }
         //根据角色ID获取角色拥有的菜单资源
-        Set<WebResource> res = role.getResources();
-        for (WebResource resource : res) {
-            resources.add(resource);
-        }
-        
-        Set<GrantedAuthority> authSet = new HashSet<GrantedAuthority>();
-        for (WebResource r : resources) {
-            //用户可以访问的资源名称（或者说用户所拥有的权限）
-            authSet.add(new SimpleGrantedAuthority(r.getValue()));
+        CopyOnWriteArrayList<RoleMenuVo> roleMenuList = this.roleMenuService.selectRoleMenuByRoleIdIn(roleIds);
+        for (RoleMenuVo roleMenuVo : roleMenuList) {
+            Set<SysResourceMenusEntity> res = roleMenuVo.getResourceMenusList();
+            for (SysResourceMenusEntity sysResourceMenusEntity : res) {
+            	//用户可以访问的资源名称（或者说用户所拥有的权限标识）
+                authSet.add(new SimpleGrantedAuthority(sysResourceMenusEntity.getAuthorizedSigns()));
+			}
         }
         return authSet;
     }
