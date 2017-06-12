@@ -64,6 +64,11 @@ public class SysLogsEntity implements Serializable {
      * 异常代码
      */
     private String errorCode;
+    
+    /**
+     * 代码值
+     */
+    private String codeValue;
 
     /**
      * 创建时间
@@ -358,6 +363,15 @@ public class SysLogsEntity implements Serializable {
 	public void setWasteTime(Long wasteTime) {
 		this.wasteTime = wasteTime;
 	}
+
+	public String getCodeValue() {
+		return codeValue;
+	}
+
+	public void setCodeValue(String codeValue) {
+		this.codeValue = codeValue;
+	}
     
+	
     
 }

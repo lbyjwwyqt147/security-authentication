@@ -16,6 +16,11 @@ public class SysRoleEntity implements Serializable {
     private Integer id;
 
     /**
+     * 角色标识
+     */
+    private String roleMarking;
+    
+    /**
      * 角色名称
      */
     private String roleName;
@@ -185,4 +190,14 @@ public class SysRoleEntity implements Serializable {
     public void setUpdateDate(Date updateDate) {
         this.updateDate = updateDate;
     }
+
+	public String getRoleMarking() {
+		return roleMarking;
+	}
+
+	public void setRoleMarking(String roleMarking) {
+		this.roleMarking = roleMarking;
+	}
+    
+    
 }

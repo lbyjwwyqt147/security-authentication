@@ -10,10 +10,22 @@ Target Server Type    : MYSQL
 Target Server Version : 50717
 File Encoding         : 65001
 
-Date: 2017-05-11 17:56:24
+Date: 2017-06-12 17:24:40
 */
 
 SET FOREIGN_KEY_CHECKS=0;
+
+-- ----------------------------
+-- Table structure for persistent_logins
+-- ----------------------------
+DROP TABLE IF EXISTS `persistent_logins`;
+CREATE TABLE `persistent_logins` (
+  `username` varchar(64) NOT NULL,
+  `series` varchar(64) NOT NULL,
+  `token` varchar(64) NOT NULL,
+  `last_used` datetime NOT NULL,
+  PRIMARY KEY (`series`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='SpringSecurity 自动登录需要的表';
 
 -- ----------------------------
 -- Table structure for sys_logs
@@ -33,16 +45,13 @@ CREATE TABLE `sys_logs` (
   `description_` varchar(255) DEFAULT NULL COMMENT '描述',
   `error_code_` varchar(500) DEFAULT NULL COMMENT '异常代码',
   `error_msg_` longtext COMMENT '异常信息',
+  `code_value_` varchar(20) DEFAULT NULL COMMENT '代码值（存放代码值 比如100006）',
   `method_result_value_` longtext COMMENT '请求方法返回值',
   `create_date_` datetime DEFAULT NULL COMMENT '创建时间',
   `waste_time_` bigint(20) DEFAULT NULL COMMENT '方法消耗时间(秒为单位)',
   `waste_time_msg_` varchar(32) DEFAULT NULL COMMENT '方法执行消耗时间转换值',
   PRIMARY KEY (`id_`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='日志纪录';
-
--- ----------------------------
--- Records of sys_logs
--- ----------------------------
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COMMENT='日志纪录';
 
 -- ----------------------------
 -- Table structure for sys_resource_menus
@@ -67,15 +76,12 @@ CREATE TABLE `sys_resource_menus` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='资源菜单';
 
 -- ----------------------------
--- Records of sys_resource_menus
--- ----------------------------
-
--- ----------------------------
 -- Table structure for sys_role
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_role`;
 CREATE TABLE `sys_role` (
   `id_` int(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `role_marking_` varchar(40) DEFAULT NULL COMMENT '角色标识',
   `role_name_` varchar(40) NOT NULL COMMENT '角色名称',
   `remarks_` varchar(255) DEFAULT NULL COMMENT '备注',
   `status_` char(4) DEFAULT NULL COMMENT '状态 1001：禁用   1002：正常',
@@ -85,10 +91,6 @@ CREATE TABLE `sys_role` (
   `update_date_` datetime DEFAULT NULL COMMENT '修改时间',
   PRIMARY KEY (`id_`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='角色';
-
--- ----------------------------
--- Records of sys_role
--- ----------------------------
 
 -- ----------------------------
 -- Table structure for sys_role_menu
@@ -102,10 +104,6 @@ CREATE TABLE `sys_role_menu` (
   `create_user_id_` int(11) NOT NULL COMMENT '创建时间',
   PRIMARY KEY (`id_`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='角色与菜单对应关系(角色资源菜单)';
-
--- ----------------------------
--- Records of sys_role_menu
--- ----------------------------
 
 -- ----------------------------
 -- Table structure for sys_users_account
@@ -126,10 +124,6 @@ CREATE TABLE `sys_users_account` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='账户';
 
 -- ----------------------------
--- Records of sys_users_account
--- ----------------------------
-
--- ----------------------------
 -- Table structure for sys_user_role
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_user_role`;
@@ -141,7 +135,3 @@ CREATE TABLE `sys_user_role` (
   `create_user_id_` int(11) NOT NULL COMMENT '创建时间',
   PRIMARY KEY (`id_`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户与角色对应关系(用户角色)';
-
--- ----------------------------
--- Records of sys_user_role
--- ----------------------------

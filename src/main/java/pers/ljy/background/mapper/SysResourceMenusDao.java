@@ -1,9 +1,9 @@
 package pers.ljy.background.mapper;
 
 
-import java.util.List;
 
 import pers.ljy.background.model.SysResourceMenusEntity;
+import pers.ljy.background.share.dao.BaseDao;
 
 /***
  * 文件名称: SysResourceMenusDao.java
@@ -16,33 +16,6 @@ import pers.ljy.background.model.SysResourceMenusEntity;
  * @version 1.0
  * @author ljy
  */
-public interface SysResourceMenusDao {
-    /**
-     * 根据主键删除数据库的记录
-     * @param id
-     */
-    int deleteByPrimaryKey(Integer id);
-
-    /**
-     * 插入数据库记录
-     * @param record
-     */
-    int insert(SysResourceMenusEntity record);
-
-    /**
-     * 根据主键获取一条数据库记录
-     * @param id
-     */
-    SysResourceMenusEntity selectByPrimaryKey(Integer id);
-
-    /**
-     * 获取全部数据库记录
-     */
-    List<SysResourceMenusEntity> selectAll();
-
-    /**
-     * 根据主键来更新数据库记录
-     * @param record
-     */
-    int updateByPrimaryKey(SysResourceMenusEntity record);
+public interface SysResourceMenusDao extends BaseDao<SysResourceMenusEntity, Integer> {
+    
 }

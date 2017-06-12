@@ -4,6 +4,7 @@
   <resultMap id="BaseResultMap" type="pers.ljy.background.model.SysRoleEntity">
     <id column="id_" jdbcType="INTEGER" property="id" />
     <result column="role_name_" jdbcType="VARCHAR" property="roleName" />
+    <result column="role_marking_" jdbcType="VARCHAR" property="roleMarking" />
     <result column="remarks_" jdbcType="VARCHAR" property="remarks" />
     <result column="status_" jdbcType="CHAR" property="status" />
     <result column="create_date_" jdbcType="TIMESTAMP" property="createDate" />
@@ -12,7 +13,7 @@
     <result column="update_date_" jdbcType="TIMESTAMP" property="updateDate" />
   </resultMap>
   <sql id="Base_Column_List" >
-      id_, role_name_, remarks_, 
+      id_, role_name_, remarks_, role_marking_,
       status_, create_date_, create_user_id_, 
       update_user_id_, update_date_
   </sql>
@@ -30,6 +31,9 @@
       </if>
       <if test="roleName != null" >
         role_name_,
+      </if>
+      <if test="roleMarking != null" >
+        role_marking_,
       </if>
       <if test="remarks != null" >
         remarks_,
@@ -56,6 +60,9 @@
       </if>
       <if test="roleName != null" >
         #{roleName,jdbcType=VARCHAR},
+      </if>
+       <if test="roleMarking != null" >
+        #{roleMarking,jdbcType=VARCHAR},
       </if>
       <if test="remarks != null" >
         #{remarks,jdbcType=VARCHAR},
@@ -84,6 +91,9 @@
       <if test="roleName != null" >
         role_name_ = #{roleName,jdbcType=VARCHAR},
       </if>
+      <if test="roleMarking != null" >
+        role_marking_ = #{roleMarking,jdbcType=VARCHAR},
+      </if>
       <if test="remarks != null" >
         remarks_ = #{remarks,jdbcType=VARCHAR},
       </if>
@@ -107,8 +117,8 @@
   </update>
   <!-- 根据主键获取一条数据库记录 -->
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
-    select id_, role_name_, remarks_, status_, create_date_, create_user_id_, update_user_id_, 
-    update_date_
+    select 
+    <include refid="Base_Column_List" />
     from sys_role
     where id_ = #{id,jdbcType=INTEGER}
   </select>

@@ -5,6 +5,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import pers.ljy.background.model.SysRoleEntity;
+import pers.ljy.background.share.service.BaseService;
 
 /***
  * 文件名称: SysRoleService.java
@@ -17,7 +18,7 @@ import pers.ljy.background.model.SysRoleEntity;
  * @version 1.0
  * @author ljy
  */
-public interface SysRoleService {
+public interface SysRoleService extends BaseService<SysRoleEntity, Integer>{
 
 	/**
      * 根据一组ID 获取角色列表
