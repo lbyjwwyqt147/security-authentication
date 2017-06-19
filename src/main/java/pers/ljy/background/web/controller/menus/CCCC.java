@@ -38,6 +38,8 @@ public class CCCC {
 			   }
         }
         System.out.println(customerPhone);
+        System.out.println(System.currentTimeMillis());
+        System.out.println(System.nanoTime());
 	}
 
 }

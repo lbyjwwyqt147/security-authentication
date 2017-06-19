@@ -1,8 +1,11 @@
 package pers.ljy.background.service.user;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import pers.ljy.background.model.SysUsersAccountEntity;
 import pers.ljy.background.share.service.BaseService;
 import pers.ljy.background.web.vo.authority.UserRoleVo;
+import pers.ljy.background.web.vo.user.UsersAccountVo;
 
 /***
  * 文件名称: SysUsersAccountService.java
@@ -30,4 +33,11 @@ public interface SysUsersAccountService extends BaseService<SysUsersAccountEntit
 	 * @return
 	 */
 	UserRoleVo selectUsersAccountRoles(String userName);
+	
+	/**
+	 * 用户注册
+	 * @param usersAccountVo
+	 * @return
+	 */
+	AtomicBoolean registeredSave(UsersAccountVo usersAccountVo);
 }

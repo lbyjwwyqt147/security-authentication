@@ -112,4 +112,17 @@ public abstract class BasicController {
 	protected ApiResultView buildDefaultDatePacket(){
 		return new ApiResultView(BaseApiResultView.SUCCESS);
 	}
+	
+	/**
+	 * restful 统一 返回
+	 * @param status  状态
+	 * @param msg     消息
+	 * @param data    数据
+	 * @return
+	 */
+	protected ApiResultView buildRestful(int status,String msg,Object data){
+		return new ApiResultView(status,msg,data);
+	}
+	
+	
 }

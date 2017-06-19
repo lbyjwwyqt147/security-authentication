@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="pers.ljy.background.mapper.UserInfoDao">
+  <resultMap id="BaseResultMap" type="pers.ljy.background.model.UserInfoEntity">
+    <id column="id_" jdbcType="INTEGER" property="id" />
+    <result column="user_number_" jdbcType="VARCHAR" property="userNumber" />
+    <result column="user_nickname_" jdbcType="VARCHAR" property="userNickname" />
+    <result column="user_email_" jdbcType="VARCHAR" property="userEmail" />
+    <result column="user_phone_" jdbcType="VARCHAR" property="userPhone" />
+  </resultMap>
+  <!-- 删除 -->
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from user_info
+    where id_ = #{id,jdbcType=INTEGER}
+  </delete>
+  <!-- 插入数据 并返回ID -->
+  <insert id="insert"  useGeneratedKeys="true" keyProperty="id_"  parameterType="pers.ljy.background.model.UserInfoEntity">
+    insert into user_info (id_, user_number_, user_nickname_, 
+      user_email_, user_phone_)
+    values (#{id,jdbcType=INTEGER}, #{userNumber,jdbcType=VARCHAR}, #{userNickname,jdbcType=VARCHAR}, 
+      #{userEmail,jdbcType=VARCHAR}, #{userPhone,jdbcType=VARCHAR})
+  </insert>
+  <!-- 修改数据 -->
+  <update id="updateByPrimaryKey" parameterType="pers.ljy.background.model.UserInfoEntity">
+    update user_info
+    set user_number_ = #{userNumber,jdbcType=VARCHAR},
+      user_nickname_ = #{userNickname,jdbcType=VARCHAR},
+      user_email_ = #{userEmail,jdbcType=VARCHAR},
+      user_phone_ = #{userPhone,jdbcType=VARCHAR}
+    where id_ = #{id,jdbcType=INTEGER}
+  </update>
+  <!-- 根据ID获取数据 -->
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select id_, user_number_, user_nickname_, user_email_, user_phone_
+    from user_info
+    where id_ = #{id,jdbcType=INTEGER}
+  </select>
+  <!-- 获取全部数据 -->
+  <select id="selectAll" resultMap="BaseResultMap">
+    select id_, user_number_, user_nickname_, user_email_, user_phone_
+    from user_info
+  </select>
+</mapper>

@@ -207,7 +207,7 @@ public class WebLogAspect {
 	             if (method.getName().equals(methodName)) {    
 	                Class<?>[] clazzs = method.getParameterTypes();    
 	                 if (clazzs.length == arguments.length) {    
-	                    description = method.getAnnotation(SystemControllerLog. class).description();    
+	                    description = method.getAnnotation(SystemControllerLog.class).description();    
 	                     break;    
 	                }    
 	            }    
