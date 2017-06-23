@@ -9,7 +9,6 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.SecurityMetadataSource;
 import org.springframework.security.access.intercept.AbstractSecurityInterceptor;
@@ -55,8 +54,8 @@ public class MyFilterSecurityInterceptor extends AbstractSecurityInterceptor imp
 	@Override
 	public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
 			throws IOException, ServletException {
-		FilterInvocation fi = new FilterInvocation(servletRequest, servletResponse, filterChain);
-        this.invoke(fi);
+		 FilterInvocation fi = new FilterInvocation(servletRequest, servletResponse, filterChain);
+         this.invoke(fi);
 	}
 
     private void invoke(FilterInvocation fi) throws IOException, ServletException {

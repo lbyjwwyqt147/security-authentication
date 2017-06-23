@@ -18,7 +18,6 @@ public class SysLogsServiceImpl extends BaseServiceImpl<SysLogsEntity, Integer> 
 
 	@Override
 	public BaseDao<SysLogsEntity, Integer> getDao() {
-		System.out.println("SysLogsServiceImpl === "+ logsDao);
 		return logsDao;
 	}
 

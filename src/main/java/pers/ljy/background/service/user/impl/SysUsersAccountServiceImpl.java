@@ -15,6 +15,7 @@ import pers.ljy.background.model.UserInfoEntity;
 import pers.ljy.background.service.user.SysUsersAccountService;
 import pers.ljy.background.service.user.UserInfoService;
 import pers.ljy.background.share.dao.BaseDao;
+import pers.ljy.background.share.exception.BusinessException;
 import pers.ljy.background.share.service.impl.BaseServiceImpl;
 import pers.ljy.background.share.utils.DozerMapper;
 import pers.ljy.background.web.vo.authority.UserRoleVo;
@@ -62,21 +63,22 @@ public class SysUsersAccountServiceImpl extends BaseServiceImpl<SysUsersAccountE
 	public AtomicBoolean registeredSave(UsersAccountVo usersAccountVo) {
 		AtomicBoolean success = new AtomicBoolean(false);
 		if(StringUtils.isBlank(usersAccountVo.getUserName())){
-            throw new RuntimeException("帐号不能为空.");
+            throw new BusinessException("帐号不能为空.");
 		}
 		if(StringUtils.isBlank(usersAccountVo.getUserPwd())){
-            throw new RuntimeException("密码不能为空.");
+            throw new BusinessException("密码不能为空.");
 		}
         try {
     		//用户信息
     		UserInfoEntity userInfo = DozerMapper.map(usersAccountVo, UserInfoEntity.class);
     		String userNumber = String.valueOf(System.nanoTime());
     		userInfo.setUserNumber(userNumber);
+    		userInfo.setUserNickname("默认昵称");
     		int userId = this.userInfoService.insert(userInfo);
     		//帐号信息
     		SysUsersAccountEntity  account = DozerMapper.map(usersAccountVo, SysUsersAccountEntity.class);
     		account.setUserId(userId);
-    		account.setUserNumber(userNumber);
+    		//account.setUserNumber(userNumber);
     		int count = this.sysUsersAccountDao.insert(account);
     		if(count > 0){
     			success.set(true);
