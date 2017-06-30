@@ -28,7 +28,7 @@ import pers.ljy.background.share.result.BaseApiResultView;
  * @version 1.0
  * @author ljy
  */
-@RequestMapping("/security/api")
+@RequestMapping("/security/api/v1")
 public abstract class BasicController {
 
     private static final Logger LOG = LoggerFactory.getLogger(BasicController.class);

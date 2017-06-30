@@ -40,6 +40,48 @@ public class CCCC {
         System.out.println(customerPhone);
         System.out.println(System.currentTimeMillis());
         System.out.println(System.nanoTime());
+        
+        
+        List<Map<String, String>> list = new ArrayList<Map<String,String>>();
+        Map<String, String> amap = new HashMap<String, String>();
+        amap.put("userName", "a");
+        amap.put("phone", "q");
+
+        list.add(amap);
+        Map<String, String> bmap = new HashMap<String, String>();
+        bmap.put("phone", "b");
+        bmap.put("userName", "c");
+
+        list.add(bmap);
+        
+    	StringBuffer phoneBuffer = new StringBuffer();
+    	StringBuffer userBuffer = new StringBuffer();
+    	int i = 1;
+    	for (Map<String, String> map : list) {  
+	    	for (Map.Entry<String, String> sendUserMap : map.entrySet()) {
+		        if(sendUserMap.getKey().equals("phone")){
+		        	if(StringUtils.isNotBlank(sendUserMap.getValue())){
+		        		 phoneBuffer.append(sendUserMap.getValue());
+		        		 if(i < list.size()){
+		        			 phoneBuffer.append(",");
+		        		 }
+		        	}
+		        }
+		        if(sendUserMap.getKey().equals("userName")){
+		        	if(StringUtils.isNotBlank(sendUserMap.getValue())){
+		        		userBuffer.append(sendUserMap.getValue());
+		        		if(i < list.size()){
+		        			userBuffer.append(",");
+		        		 }
+		        	}
+		        }
+			}
+	    	i++;
+	    } 
+        
+    	System.out.println(phoneBuffer.toString());
+    	System.out.println(userBuffer.toString());
+        
 	}
 
 }
