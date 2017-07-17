@@ -1,0 +1,61 @@
+package pers.ljy.background.web.controller.authority;
+
+import java.util.concurrent.CopyOnWriteArrayList;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import pers.ljy.background.model.SysRoleEntity;
+import pers.ljy.background.service.authority.SysRoleService;
+import pers.ljy.background.share.result.ApiResultCode;
+import pers.ljy.background.share.result.ApiResultView;
+import pers.ljy.background.web.controller.BasicController;
+import pers.ljy.background.web.vo.authority.RoleVo;
+
+/***
+ * 文件名称: RoleController.java
+ * 文件描述: 角色 controller
+ * 公 司: 
+ * 内容摘要: 
+ * 其他说明:
+ * 完成日期:2017年07月17日 
+ * 修改记录:
+ * @version 1.0
+ * @author ljy
+ */
+@RestController
+public class RoleController extends BasicController{
+	
+	@Autowired
+	private SysRoleService roleService;
+	
+	/**
+	 * 保存角色
+	 * @param role
+	 * @return
+	 */
+	@PostMapping(value="/roles")
+	public ApiResultView save(SysRoleEntity role){
+		int status = ApiResultCode.FAIL.getCode();
+		String msg = ApiResultCode.FAIL.getMsg();
+		int count = this.roleService.insert(role);
+		if(count > 0){
+			return this.buildDefaultDatePacket();
+		}
+		return this.buildRestful(status, msg, null);
+	}
+	
+	/**
+	 * 角色列表
+	 * @param from
+	 * @return
+	 */
+	@GetMapping(value="/roles")
+	public ApiResultView list(RoleVo from){
+		CopyOnWriteArrayList<SysRoleEntity> list = this.roleService.selectAll();
+		return this.buildDataPacket(list);
+	}
+
+}
