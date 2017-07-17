@@ -13,6 +13,17 @@ import pers.ljy.background.share.result.ApiResultView;
 import pers.ljy.background.web.controller.BasicController;
 import pers.ljy.background.web.vo.user.UsersAccountVo;
 
+/***
+ * 文件名称: UserAccountController.java
+ * 文件描述: 用户 controller
+ * 公 司: 
+ * 内容摘要: 
+ * 其他说明:
+ * 完成日期:2017年05月09日 
+ * 修改记录:
+ * @version 1.0
+ * @author ljy
+ */
 @RestController
 public class UserAccountController extends BasicController {
 	@Autowired

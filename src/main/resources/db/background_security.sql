@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50717
 File Encoding         : 65001
 
-Date: 2017-06-12 17:24:40
+Date: 2017-07-14 08:39:22
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -51,7 +51,7 @@ CREATE TABLE `sys_logs` (
   `waste_time_` bigint(20) DEFAULT NULL COMMENT '方法消耗时间(秒为单位)',
   `waste_time_msg_` varchar(32) DEFAULT NULL COMMENT '方法执行消耗时间转换值',
   PRIMARY KEY (`id_`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COMMENT='日志纪录';
+) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COMMENT='日志纪录';
 
 -- ----------------------------
 -- Table structure for sys_resource_menus
@@ -135,3 +135,16 @@ CREATE TABLE `sys_user_role` (
   `create_user_id_` int(11) NOT NULL COMMENT '创建时间',
   PRIMARY KEY (`id_`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户与角色对应关系(用户角色)';
+
+-- ----------------------------
+-- Table structure for user_info
+-- ----------------------------
+DROP TABLE IF EXISTS `user_info`;
+CREATE TABLE `user_info` (
+  `id_` int(11) NOT NULL AUTO_INCREMENT,
+  `user_number_` varchar(32) NOT NULL COMMENT '用户编号',
+  `user_nickname_` varchar(20) NOT NULL COMMENT '昵称',
+  `user_email_` varchar(100) NOT NULL COMMENT '邮箱',
+  `user_phone_` varchar(20) DEFAULT NULL COMMENT '电话',
+  PRIMARY KEY (`id_`)
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COMMENT='用户信息';
