@@ -23,7 +23,7 @@ public class UserAccountController extends BasicController {
 	 * @param usersAccountVo
 	 * @return
 	 */
-	@PostMapping("/signin")
+	@PostMapping("/users/signins")
 	@SystemControllerLog(description = "用户注册") 
 	public ApiResultView registered(UsersAccountVo usersAccountVo){
 		int status = ApiResultCode.FAIL.getCode();

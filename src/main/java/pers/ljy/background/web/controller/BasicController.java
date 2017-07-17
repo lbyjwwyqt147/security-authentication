@@ -75,10 +75,10 @@ public abstract class BasicController {
 	 * @param ex
 	 * @return
 	 */
-	@ExceptionHandler
+/*	@ExceptionHandler
 	public ApiResultView error(Exception ex){
 		LOG.error(ex.getMessage(), ex);
-		return new ApiResultView(BaseApiResultView.FAIL);
+		return new ApiResultView(BaseApiResultView.ERROR);
 	}
 	
 	@ExceptionHandler
@@ -87,12 +87,12 @@ public abstract class BasicController {
 		if (null != bex.getErrorCode() && null != buildErrDataPacket(bex)) {
 			return buildErrDataPacket(bex);
 		}
-		return new ApiResultView(BaseApiResultView.FAIL.getStatus(), bex.getMessage());
+		return new ApiResultView(BaseApiResultView.ERROR.getStatus(), bex.getMessage());
 	}
 	
 	protected ApiResultView buildErrDataPacket(BusinessException bex) {
 		return null;
-	}
+	}*/
 	
 	/**
 	 * 默认返回 成功 (带data数据)
