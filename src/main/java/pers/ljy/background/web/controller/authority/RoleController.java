@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import pers.ljy.background.model.SysRoleEntity;
 import pers.ljy.background.service.authority.SysRoleService;
+import pers.ljy.background.share.dto.PageForm;
 import pers.ljy.background.share.result.ApiResultCode;
 import pers.ljy.background.share.result.ApiResultView;
 import pers.ljy.background.web.controller.BasicController;
@@ -55,7 +56,10 @@ public class RoleController extends BasicController{
 	@GetMapping(value="/roles")
 	public ApiResultView list(RoleVo from){
 		CopyOnWriteArrayList<SysRoleEntity> list = this.roleService.selectAll();
-		return this.buildDataPacket(list);
+		PageForm<SysRoleEntity> pageForm = new PageForm<SysRoleEntity>();
+		pageForm.setTotal(10);
+		pageForm.setRows(list);
+		return this.buildDataPacket(pageForm);
 	}
 
 }
