@@ -44,7 +44,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 //.antMatchers("/resources").hasAuthority("ADMIN") //登陆后之后拥有“ADMIN”权限才可以访问/hello方法，否则系统会出现“403”权限不足的提示
          .and()
                 .formLogin()
-                .loginPage("/")//指定登录页是”/”
+                .loginPage("/security/api/v1/users/logins")//指定登录页是”/”
                 .permitAll()
                 .successHandler(loginSuccessHandler()) //登录成功后可使用loginSuccessHandler()存储用户信息，可选。
          .and()

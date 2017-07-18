@@ -1,5 +1,6 @@
 package pers.ljy.background.service.user.impl;
 
+import java.util.Date;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.lang3.StringUtils;
@@ -55,7 +56,7 @@ public class SysUsersAccountServiceImpl extends BaseServiceImpl<SysUsersAccountE
 
 	@Override
 	public UserRoleVo selectUsersAccountRoles(String userName) {
-		return this.selectUsersAccountRoles(userName);
+		return this.sysUsersAccountDao.selectUsersAccountRoles(userName);
 	}
 
 
@@ -73,12 +74,13 @@ public class SysUsersAccountServiceImpl extends BaseServiceImpl<SysUsersAccountE
     		UserInfoEntity userInfo = DozerMapper.map(usersAccountVo, UserInfoEntity.class);
     		String userNumber = String.valueOf(System.nanoTime());
     		userInfo.setUserNumber(userNumber);
-    		userInfo.setUserNickname("默认昵称");
+    		//userInfo.setUserNickname("默认昵称");
     		int userId = this.userInfoService.insert(userInfo);
     		//帐号信息
     		SysUsersAccountEntity  account = DozerMapper.map(usersAccountVo, SysUsersAccountEntity.class);
     		account.setUserId(userId);
-    		//account.setUserNumber(userNumber);
+    		account.setUserNumber(userNumber);
+    		account.setCreateDate(new Date());
     		int count = this.sysUsersAccountDao.insert(account);
     		if(count > 0){
     			success.set(true);

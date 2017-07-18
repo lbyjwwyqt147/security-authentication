@@ -3,9 +3,11 @@ package pers.ljy.background.web.controller.user;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import pers.ljy.background.model.SysUsersAccountEntity;
 import pers.ljy.background.service.user.SysUsersAccountService;
 import pers.ljy.background.share.logs.SystemControllerLog;
 import pers.ljy.background.share.result.ApiResultCode;
@@ -43,6 +45,24 @@ public class UserAccountController extends BasicController {
 		if(success.get()){
 			status = ApiResultCode.SUCCESS.getCode();
 			msg = "注册成功.";
+		}
+		return this.buildRestful(status, msg, null);
+	}
+	
+	/**
+	 * 用户登录
+	 * @param usersAccountVo
+	 * @return
+	 */
+	@PostMapping("/users/logins")
+	@SystemControllerLog(description = "用户登录") 
+	public ApiResultView logins(UsersAccountVo usersAccountVo){
+		int status = ApiResultCode.FAIL.getCode();
+		String msg = "登录失败.";
+		SysUsersAccountEntity accountEntity  = this.usersAccountService.selectUsersAccount(usersAccountVo.getUserName());
+		if(accountEntity != null){
+			status = ApiResultCode.SUCCESS.getCode();
+			msg = "登录成功.";
 		}
 		return this.buildRestful(status, msg, null);
 	}
