@@ -5,6 +5,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import pers.ljy.background.model.SysUsersAccountEntity;
@@ -54,9 +55,11 @@ public class UserAccountController extends BasicController {
 	 * @param usersAccountVo
 	 * @return
 	 */
-	@PostMapping("/users/logins")
+	@RequestMapping(value="/users/logins")
 	@SystemControllerLog(description = "用户登录") 
-	public ApiResultView logins(UsersAccountVo usersAccountVo){
+	public ApiResultView logins(String userName){
+		UsersAccountVo usersAccountVo =  new UsersAccountVo();
+		usersAccountVo.setUserName(userName);
 		int status = ApiResultCode.FAIL.getCode();
 		String msg = "登录失败.";
 		SysUsersAccountEntity accountEntity  = this.usersAccountService.selectUsersAccount(usersAccountVo.getUserName());
