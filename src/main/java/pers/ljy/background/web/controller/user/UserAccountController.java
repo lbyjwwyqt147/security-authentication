@@ -1,5 +1,6 @@
 package pers.ljy.background.web.controller.user;
 
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,8 +9,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import pers.ljy.background.model.SysRoleEntity;
 import pers.ljy.background.model.SysUsersAccountEntity;
 import pers.ljy.background.service.user.SysUsersAccountService;
+import pers.ljy.background.share.dto.PageForm;
 import pers.ljy.background.share.logs.SystemControllerLog;
 import pers.ljy.background.share.result.ApiResultCode;
 import pers.ljy.background.share.result.ApiResultView;
@@ -68,5 +71,19 @@ public class UserAccountController extends BasicController {
 			msg = "登录成功.";
 		}
 		return this.buildRestful(status, msg, null);
+	}
+	
+	/**
+	 * 用户列表
+	 * @return
+	 */
+	@GetMapping(value="/users")
+	@SystemControllerLog(description="用户列表")
+	public ApiResultView userLists(){
+		CopyOnWriteArrayList<SysUsersAccountEntity> list = this.usersAccountService.selectAll();
+		PageForm<SysUsersAccountEntity> pageForm = new PageForm<SysUsersAccountEntity>();
+		pageForm.setTotal(10);
+		pageForm.setRows(list);
+		return this.buildDataPacket(pageForm);
 	}
 }

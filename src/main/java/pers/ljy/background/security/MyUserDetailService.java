@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,11 +21,12 @@ import org.springframework.stereotype.Component;
 import pers.ljy.background.model.SysResourceMenusEntity;
 import pers.ljy.background.model.SysRoleEntity;
 import pers.ljy.background.model.SysUserRoleEntity;
+import pers.ljy.background.model.SysUsersAccountEntity;
 import pers.ljy.background.service.authority.SysRoleMenuService;
 import pers.ljy.background.service.authority.SysRoleService;
+import pers.ljy.background.service.authority.SysUserRoleService;
 import pers.ljy.background.service.user.SysUsersAccountService;
 import pers.ljy.background.web.vo.authority.RoleMenuVo;
-import pers.ljy.background.web.vo.authority.UserRoleVo;
 
 /***
  * 文件名称: MyUserDetailService.java  用户请求登录会进入此类的loadUserByUsername方法 验证用户
@@ -56,20 +58,24 @@ public class MyUserDetailService implements UserDetailsService {
     private SysRoleMenuService roleMenuService;	
 	@Autowired
 	private SysRoleService roleService;
+	@Autowired
+	private SysUserRoleService userRoleService;
 	
 	@Override
 	public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
 		LOGGER.info(" userName: " + userName);
 		//获取账户信息
-		UserRoleVo usersRoleVo = this.usersAccountService.selectUsersAccountRoles(userName);
-		if(usersRoleVo == null){
+		SysUsersAccountEntity users = this.usersAccountService.selectUsersAccount(userName);
+		if(users == null){
 			throw new UsernameNotFoundException("UserName " + userName + " not found"); 
 		}
-		  // 取得用户的权限
-        Collection<GrantedAuthority> grantedAuths = obtionGrantedAuthorities(usersRoleVo);
+		
+		// 取得用户的权限
+		CopyOnWriteArrayList<SysUserRoleEntity> userRoleList = this.userRoleService.selectUserRoleByUserId(users.getId());
+        Collection<GrantedAuthority> grantedAuths = obtionGrantedAuthorities(users,userRoleList);
         Set<GrantedAuthority> grantedAuthorities = new HashSet<GrantedAuthority>();
         List<Integer> roleIdsList = new ArrayList<>();
-        for (SysUserRoleEntity role : usersRoleVo.getUserRoleList()) {
+        for (SysUserRoleEntity role : userRoleList) {
         	roleIdsList.add(role.getRoleId());
         }
         CopyOnWriteArrayList<SysRoleEntity> roleEntitieList = this.roleService.selectByPrimaryKeyIn(roleIdsList);
@@ -77,7 +83,7 @@ public class MyUserDetailService implements UserDetailsService {
             grantedAuthorities.add(new SimpleGrantedAuthority(sysRoleEntity.getRoleName()));
 		}
         // 封装成spring security的user
-        User userDetail = new User(usersRoleVo.getUserName(), usersRoleVo.getUserPwd(),
+        User userDetail = new User(users.getUserName(), users.getUserPwd(),
                 true,//是否可用
                 true,//是否过期
                 true,//证书不过期为true
@@ -91,10 +97,10 @@ public class MyUserDetailService implements UserDetailsService {
 	 * @param usersRoleVo
 	 * @return
 	 */
-    private Set<GrantedAuthority> obtionGrantedAuthorities(UserRoleVo usersRoleVo) {
+    private Set<GrantedAuthority> obtionGrantedAuthorities(SysUsersAccountEntity users,CopyOnWriteArrayList<SysUserRoleEntity> userRoleList ) {
         Set<GrantedAuthority> authSet = new HashSet<GrantedAuthority>();
         //获取用户的角色
-        Set<SysUserRoleEntity> roles = usersRoleVo.getUserRoleList();
+        CopyOnWriteArraySet<SysUserRoleEntity> roles = new CopyOnWriteArraySet<>(userRoleList);
         CopyOnWriteArrayList<Integer> roleIds =  new CopyOnWriteArrayList<>();
         for (SysUserRoleEntity role : roles) {
         	roleIds.add(role.getRoleId());

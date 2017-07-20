@@ -26,6 +26,7 @@ public interface SysRoleService extends BaseService<SysRoleEntity, Integer>{
      * @return
      */
 	CopyOnWriteArrayList<SysRoleEntity> selectByPrimaryKeyIn(List<Integer> ids);
+	
     /**
      * 一组角色名称
      * @param ids
