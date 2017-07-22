@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.alibaba.fastjson.JSON;
+
 import pers.ljy.background.share.exception.BusinessException;
 import pers.ljy.background.share.result.ApiResultView;
 import pers.ljy.background.share.result.BaseApiResultView;
@@ -102,6 +104,16 @@ public abstract class BasicController {
 	 */
 	protected ApiResultView buildDataPacket(Object data){
 		return new ApiResultView(BaseApiResultView.SUCCESS, data);
+	}
+	
+	/**
+	 * 分页列表默认返回结构
+	 * 
+	 * @param data
+	 * @return
+	 */
+	protected String buildListsData(Object data){
+		return JSON.toJSONString(data);
 	}
 	
 	/**

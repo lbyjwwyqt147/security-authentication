@@ -1,5 +1,6 @@
 package pers.ljy.background.web.controller.authority;
 
+import java.util.Date;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +42,8 @@ public class RoleController extends BasicController{
 	public ApiResultView save(SysRoleEntity role){
 		int status = ApiResultCode.FAIL.getCode();
 		String msg = ApiResultCode.FAIL.getMsg();
+		role.setCreateDate(new Date());
+		role.setCreateUserId(1);
 		int count = this.roleService.insert(role);
 		if(count > 0){
 			return this.buildDefaultDatePacket();
@@ -54,12 +57,12 @@ public class RoleController extends BasicController{
 	 * @return
 	 */
 	@GetMapping(value="/roles")
-	public ApiResultView list(RoleVo from){
+	public String list(RoleVo from){
 		CopyOnWriteArrayList<SysRoleEntity> list = this.roleService.selectAll();
 		PageForm<SysRoleEntity> pageForm = new PageForm<SysRoleEntity>();
 		pageForm.setTotal(10);
 		pageForm.setRows(list);
-		return this.buildDataPacket(pageForm);
+		return this.buildListsData(pageForm);
 	}
 
 }
