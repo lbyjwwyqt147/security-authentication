@@ -62,6 +62,7 @@ public class RoleController extends BasicController{
 		PageForm<SysRoleEntity> pageForm = new PageForm<SysRoleEntity>();
 		pageForm.setTotal(10);
 		pageForm.setRows(list);
+		
 		return this.buildListsData(pageForm);
 	}
 
