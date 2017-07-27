@@ -17,6 +17,19 @@
         <relativePath/> 
   </parent>
     
+  <repositories>
+    <repository>
+        <id>maven-repository-master</id>
+        <url>https://raw.github.com/lbyjwwyqt147/maven-repo/master/</url>
+        <snapshots>
+            <enabled>true</enabled>
+            <updatePolicy>always</updatePolicy>
+        </snapshots>
+    </repository>
+</repositories>
+
+    
+    
   <dependencies>
     <dependency>
       <groupId>javax</groupId>
@@ -33,10 +46,10 @@
 		
      <!-- 项目中公共共享包开始 -->
      <dependency>
-		   <groupId>security-authentication-share</groupId>
+		   <groupId>com.repo.authentication</groupId>
          <artifactId>security-authentication-share</artifactId>
          <version>0.0.1-SNAPSHOT</version>
-     </dependency>
+     </dependency> 
      <!-- 项目中公共共享包开jieshu-->
      
      <dependency>
