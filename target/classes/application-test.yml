@@ -1,6 +1,6 @@
 #端口
 server:
-  port: 8082
+  port: 18082
 
 #数据源配置
 druid:

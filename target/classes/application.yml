@@ -22,4 +22,8 @@ mybatis:
       pageSizeZero: true
       params: pageNum=start;pageSize=limit;
          
+#基础配置
+basic:
+  #版本
+  version: 1
 

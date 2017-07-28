@@ -85,5 +85,11 @@
     select id_, user_id_, role_id_, create_date_, create_user_id_
     from sys_user_role
   </select>
+   <!-- 根据用户ID获取用户角色 -->
+  <select id="selectUserRoleByUserId" resultMap="BaseResultMap">
+    select id_, user_id_, role_id_, create_date_, create_user_id_
+    from sys_user_role 
+    where user_id_ = #{userId,jdbcType=INTEGER}
+  </select>
   
 </mapper>

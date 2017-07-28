@@ -8,9 +8,33 @@
     <result column="create_date_" jdbcType="TIMESTAMP" property="createDate" />
     <result column="create_user_id_" jdbcType="INTEGER" property="createUserId" />
   </resultMap>
+    <!-- 角色对应的资源菜单 -->
+  <resultMap id="RoleMenuResultMap" type="pers.ljy.background.web.vo.authority.RoleMenuVo">
+    <id column="id_" jdbcType="INTEGER" property="id" />
+    <result column="role_id_" jdbcType="INTEGER" property="roleId" />
+    <result column="menu_id_" jdbcType="INTEGER" property="menuId" />
+    <collection property="userRoleList" column="userId" ofType="pers.ljy.background.model.SysResourceMenusEntity">    
+        <id column="id_" jdbcType="INTEGER" property="id" />
+	    <result column="menu_number_" jdbcType="VARCHAR" property="menuNumber" />
+	    <result column="menu_name_" jdbcType="VARCHAR" property="menuName" />
+	    <result column="menu_type_" jdbcType="CHAR" property="menuType" />
+	    <result column="parent_menu_number_" jdbcType="VARCHAR" property="parentMenuNumber" />
+	    <result column="serial_number_" jdbcType="TINYINT" property="serialNumber" />
+	    <result column="menu_icon_" jdbcType="VARCHAR" property="menuIcon" />
+	    <result column="menu_url_" jdbcType="VARCHAR" property="menuUrl" />
+	    <result column="authorized_signs_" jdbcType="VARCHAR" property="authorizedSigns" />
+	    <result column="status_" jdbcType="CHAR" property="status" />
+    </collection> 
+  </resultMap>
   <sql id="Base_Column_List" >
       id_, role_id_, menu_id_, 
       create_date_, create_user_id
+  </sql>
+   <sql id="ROLE_MENU_Column_List" >
+    r.id_, r.role_id_, r.menu_id_, 
+    m.id_, m.menu_number_, m.menu_name_, 
+    m.menu_type_, m.parent_menu_number_, m.serial_number_, 
+    m.menu_icon_,m.authorized_signs_,m.status_
   </sql>
   <!-- 根据主键删除数据库的记录 -->
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
@@ -86,6 +110,15 @@
     select 
     <include refid="Base_Column_List" />
     from sys_role_menu
+  </select>
+  <!-- 获取角色ID获取角色资源菜单 -->
+  <select id="selectRoleMenuByRoleIdIn" resultMap="RoleMenuResultMap">
+    select 
+    <include refid="ROLE_MENU_Column_List" />
+    from sys_role_menu r,sys_resource_menus m  where r.menu_id_ = m.id_ AND r.role_id_  in 
+    <foreach item="item" index="index" collection="list" open="(" separator="," close=")">  
+	  #{item}  
+	</foreach>  
   </select>
 
 </mapper>

@@ -16,12 +16,13 @@
     <result column="create_date_" jdbcType="TIMESTAMP" property="createDate" />
     <result column="params_" jdbcType="LONGVARCHAR" property="params" />
     <result column="error_msg_" jdbcType="LONGVARCHAR" property="errorMsg" />
+    <result column="code_value_" jdbcType="VARCHAR" property="codeValue" />
     <result column="method_result_value_" jdbcType="LONGVARCHAR" property="methodResultValue" />
     <result column="waste_time_" property="wasteTime" jdbcType="BIGINT" />
     <result column="waste_time_msg_" property="wasteTimeMsg" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id_, user_id_, logs_type_, url_, ip_, class_path_, ask_method_, method_path_, 
+    id_, user_id_, logs_type_, url_, ip_, class_path_, ask_method_, method_path_,code_value_, 
     request_method_, description_, error_code_, create_date_, params_, error_msg_, method_result_value_, waste_time_, waste_time_msg_
   </sql>
   <!-- 根据主键删除数据库的记录 -->
@@ -81,6 +82,9 @@
       <if test="errorMsg != null" >
         error_msg_,
       </if>
+      <if test="codeValue != null" >
+        code_value_,
+      </if>
       <if test="methodResultValue != null" >
         method_result_value_,
       </if>
@@ -133,6 +137,9 @@
       </if>
       <if test="errorMsg != null" >
         #{errorMsg,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="codeValue != null" >
+        #{codeValue,jdbcType=LONGVARCHAR},
       </if>
       <if test="methodResultValue != null" >
         #{methodResultValue,jdbcType=LONGVARCHAR},
@@ -187,6 +194,9 @@
 	      </if>
 	      <if test="errorMsg != null" >
 	        error_msg_ = #{errorMsg,jdbcType=LONGVARCHAR},
+	      </if>
+	       <if test="codeValue != null" >
+	        #{code_value_,jdbcType=LONGVARCHAR},
 	      </if>
 	      <if test="methodResultValue != null" >
 	        method_result_value_ = #{methodResultValue,jdbcType=LONGVARCHAR},
