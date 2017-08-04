@@ -65,5 +65,35 @@ public class RoleController extends BasicController{
 		
 		return this.buildListsData(pageForm);
 	}
+	
+	
+
+	/**
+	 * 已分配角色
+	 * @return
+	 */
+	@GetMapping(value="/userRolers/y")
+	public String ylist(int userId){
+		CopyOnWriteArrayList<SysRoleEntity> list = this.roleService.selectUserRoleByUserIdIn(userId);
+		PageForm<SysRoleEntity> pageForm = new PageForm<SysRoleEntity>();
+		pageForm.setTotal(10);
+		pageForm.setRows(list);
+		
+		return this.buildListsData(pageForm);
+	}
+	
+	/**
+	 * 未配角色
+	 * @return
+	 */
+	@GetMapping(value="/userRolers/n")
+	public String list(int userId){
+		CopyOnWriteArrayList<SysRoleEntity> list = this.roleService.selectUserRoleByUserIdNotIn(userId);
+		PageForm<SysRoleEntity> pageForm = new PageForm<SysRoleEntity>();
+		pageForm.setTotal(10);
+		pageForm.setRows(list);
+		
+		return this.buildListsData(pageForm);
+	}
 
 }

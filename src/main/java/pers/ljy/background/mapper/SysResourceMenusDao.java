@@ -2,6 +2,8 @@ package pers.ljy.background.mapper;
 
 
 
+import java.util.concurrent.CopyOnWriteArrayList;
+
 import pers.ljy.background.model.SysResourceMenusEntity;
 import pers.ljy.background.share.dao.BaseDao;
 
@@ -18,4 +20,17 @@ import pers.ljy.background.share.dao.BaseDao;
  */
 public interface SysResourceMenusDao extends BaseDao<SysResourceMenusEntity, Integer> {
     
+	/**
+	 * 根据pid获取下级数据
+	 * @param pid
+	 * @return
+	 */
+	CopyOnWriteArrayList<SysResourceMenusEntity> selectByPid(String pid);
+	
+	/**
+	 * 获取最大编号值
+	 * @param pid
+	 * @return
+	 */
+	String selectMaxPid(String pid);
 }

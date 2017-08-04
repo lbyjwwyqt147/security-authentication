@@ -1,6 +1,9 @@
 package pers.ljy.background.service.authority;
 
+import java.util.concurrent.CopyOnWriteArrayList;
+
 import pers.ljy.background.model.SysResourceMenusEntity;
+import pers.ljy.background.share.component.tree.JsTree;
 import pers.ljy.background.share.service.BaseService;
 
 /***
@@ -16,4 +19,31 @@ import pers.ljy.background.share.service.BaseService;
  */
 public interface SysResourceMenusService  extends BaseService<SysResourceMenusEntity, Integer>  {
 
+	/**
+	 * 根据pid获取下级数据
+	 * @param pid
+	 * @return
+	 */
+	CopyOnWriteArrayList<SysResourceMenusEntity> selectByPid(String pid);
+	
+	/**
+	 * 获取最大值
+	 * @param pid
+	 * @return
+	 */
+	String selectMaxPid(String pid);
+	
+	/**
+	 * 得到最新编号值
+	 * @param pid
+	 * @return
+	 */
+	String newestNumber(String pid);
+	
+	/**
+	 * 资源菜单树
+	 * @param pid
+	 * @return
+	 */
+    JsTree menusTree(String pid);
 }

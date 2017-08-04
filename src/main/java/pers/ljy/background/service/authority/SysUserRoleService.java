@@ -1,5 +1,6 @@
 package pers.ljy.background.service.authority;
 
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import pers.ljy.background.model.SysUserRoleEntity;
@@ -24,4 +25,17 @@ public interface SysUserRoleService extends BaseService<SysUserRoleEntity, Integ
 	 * @return
 	 */
 	CopyOnWriteArrayList<SysUserRoleEntity> selectUserRoleByUserId(Integer userId);
+	
+	/**
+	 * 批量插入数据
+	 * @param list
+	 */
+	void batchInsert(Integer userId,List<Integer> roleIds);
+	
+	/**
+	 * 批量删除
+	 * @param userId
+	 * @param roleIds
+	 */
+	void batchDeletes(Integer userId,CopyOnWriteArrayList<Integer> roleIds);
 }

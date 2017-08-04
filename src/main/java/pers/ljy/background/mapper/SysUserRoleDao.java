@@ -3,6 +3,7 @@ package pers.ljy.background.mapper;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import pers.ljy.background.model.SysUserRoleEntity;
 import pers.ljy.background.share.dao.BaseDao;
@@ -27,4 +28,18 @@ public interface SysUserRoleDao extends BaseDao<SysUserRoleEntity, Integer> {
 	 * @return
 	 */
 	CopyOnWriteArrayList<SysUserRoleEntity> selectUserRoleByUserId(Integer userId);
+	
+	/**
+	 * 批量插入数据
+	 * @param list
+	 */
+	void batchInsert(CopyOnWriteArrayList<SysUserRoleEntity> list);
+	
+	/**
+	 * 批量删除
+	 * @param userId
+	 * @param roleIds
+	 */
+	void batchDeletes(@Param("userId")Integer userId,@Param("roleIds")CopyOnWriteArrayList<Integer> roleIds);
+	
 }

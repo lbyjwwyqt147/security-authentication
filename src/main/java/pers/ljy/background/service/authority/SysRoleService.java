@@ -33,4 +33,19 @@ public interface SysRoleService extends BaseService<SysRoleEntity, Integer>{
      * @return
      */
     ConcurrentMap<String, String> roleBatchMap(List<Integer> ids);
+    
+    /**
+	 * 根据用户ID 获取还未分配的角色
+	 * @param userId
+	 * @return
+	 */
+	CopyOnWriteArrayList<SysRoleEntity> selectUserRoleByUserIdNotIn(Integer userId);
+	
+
+	/**
+	 * 根据用户ID 获取已分配的
+	 * @param userId
+	 * @return
+	 */
+	CopyOnWriteArrayList<SysRoleEntity> selectUserRoleByUserIdIn(Integer userId);
 }

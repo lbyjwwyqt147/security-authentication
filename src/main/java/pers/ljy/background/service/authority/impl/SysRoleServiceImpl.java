@@ -54,6 +54,16 @@ public class SysRoleServiceImpl extends BaseServiceImpl<SysRoleEntity,Integer> i
 		return map;
 	}
 
+	@Override
+	public CopyOnWriteArrayList<SysRoleEntity> selectUserRoleByUserIdNotIn(Integer userId) {
+		return this.sysRoleDao.selectUserRoleByUserIdNotIn(userId);
+	}
+
+	@Override
+	public CopyOnWriteArrayList<SysRoleEntity> selectUserRoleByUserIdIn(Integer userId) {
+		return this.sysRoleDao.selectUserRoleByUserIdIn(userId);
+	}
+
 	
 
 }

@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import pers.ljy.background.model.SysRoleEntity;
 import pers.ljy.background.model.SysUsersAccountEntity;
 import pers.ljy.background.service.user.SysUsersAccountService;
 import pers.ljy.background.share.dto.PageForm;
@@ -79,11 +78,11 @@ public class UserAccountController extends BasicController {
 	 */
 	@GetMapping(value="/users")
 	@SystemControllerLog(description="用户列表")
-	public ApiResultView userLists(){
+	public String userLists(){
 		CopyOnWriteArrayList<SysUsersAccountEntity> list = this.usersAccountService.selectAll();
 		PageForm<SysUsersAccountEntity> pageForm = new PageForm<SysUsersAccountEntity>();
 		pageForm.setTotal(10);
 		pageForm.setRows(list);
-		return this.buildDataPacket(pageForm);
+		return this.buildListsData(pageForm);
 	}
 }

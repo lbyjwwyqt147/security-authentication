@@ -1,5 +1,7 @@
 package pers.ljy.background.service.authority.impl;
 
+import java.util.Date;
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +38,25 @@ public class SysUserRoleServiceImpl extends BaseServiceImpl<SysUserRoleEntity, I
 	@Override
 	public CopyOnWriteArrayList<SysUserRoleEntity> selectUserRoleByUserId(Integer userId) {
 		return this.sysUserRoleDao.selectUserRoleByUserId(userId);
+	}
+
+	@Override
+	public void batchInsert(Integer userId, List<Integer> roleIds) {
+		CopyOnWriteArrayList<SysUserRoleEntity> list =  new CopyOnWriteArrayList<>();
+		roleIds.forEach(item -> {
+			SysUserRoleEntity entity = new SysUserRoleEntity();
+			entity.setUserId(userId);
+			entity.setRoleId(item);
+			entity.setCreateDate(new Date());
+			entity.setCreateUserId(1);
+			list.add(entity);
+		});
+		this.sysUserRoleDao.batchInsert(list);
+	}
+
+	@Override
+	public void batchDeletes(Integer userId,CopyOnWriteArrayList<Integer> roleIds) {
+		 this.sysUserRoleDao.batchDeletes(userId,roleIds);
 	}
 
 	
