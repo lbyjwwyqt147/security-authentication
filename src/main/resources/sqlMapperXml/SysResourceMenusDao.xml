@@ -180,5 +180,18 @@
     <include refid="Base_Column_List" />
     from sys_resource_menus
   </select>
+   <!-- 获取最大编号值 -->
+  <select id="selectMaxPid" resultType="java.lang.String">
+    select max(menu_number_)
+    from sys_resource_menus
+    where parent_menu_number_ = #{pid,jdbcType=VARCHAR}
+  </select>
+   <!-- 根据pid获取下级数据记录 -->
+  <select id="selectByPid" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from sys_resource_menus
+    where parent_menu_number_ = #{pid,jdbcType=VARCHAR}
+  </select>
  
 </mapper>

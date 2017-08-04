@@ -122,6 +122,20 @@
     from sys_role
     where id_ = #{id,jdbcType=INTEGER}
   </select>
+   <!-- 根据用户ID 获取已分配的角色 -->
+  <select id="selectUserRoleByUserIdIn" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from sys_role r
+    where exists (select role_id_ from sys_user_role u where user_id_ = #{userId,jdbcType=INTEGER} and r.id_ = u.role_id_)
+  </select>
+   <!-- 根据用户ID 获取还未分配的角色 -->
+  <select id="selectUserRoleByUserIdNotIn" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from sys_role r
+    where  not exists (select role_id_ from sys_user_role u where user_id_ = #{userId,jdbcType=INTEGER} and r.id_ = u.role_id_  )
+  </select>
    <!-- 获取全部数据库记录 -->
   <select id="selectAll" resultMap="BaseResultMap">
     select

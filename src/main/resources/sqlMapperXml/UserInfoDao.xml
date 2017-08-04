@@ -14,7 +14,7 @@
     where id_ = #{id,jdbcType=INTEGER}
   </delete>
   <!-- 插入数据 并返回ID -->
-  <insert id="insert"  useGeneratedKeys="true" keyProperty="id_"  parameterType="pers.ljy.background.model.UserInfoEntity">
+  <insert id="insert"   useGeneratedKeys="true" keyProperty="id" parameterType="pers.ljy.background.model.UserInfoEntity">
     insert into user_info (id_, user_number_, user_nickname_, 
       user_email_, user_phone_)
     values (#{id,jdbcType=INTEGER}, #{userNumber,jdbcType=VARCHAR}, #{userNickname,jdbcType=VARCHAR}, 
