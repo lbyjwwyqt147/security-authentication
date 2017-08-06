@@ -34,6 +34,8 @@ public class SysResourceMenusServiceImpl extends BaseServiceImpl<SysResourceMenu
 	@Autowired
 	private SysResourceMenusDao sysResourceMenusDao;
 	
+	
+	
 	@Override
 	public BaseDao<SysResourceMenusEntity, Integer> getDao() {
 		return sysResourceMenusDao;
@@ -74,6 +76,7 @@ public class SysResourceMenusServiceImpl extends BaseServiceImpl<SysResourceMenu
 		root.setText("root");
 		JsTreeState jsTreeState = new JsTreeState();
 		jsTreeState.setSelected(true);
+		jsTreeState.setOpened(true);
 		ConcurrentMap<String, Object> rootAttr = new ConcurrentHashMap<>();
 		rootAttr.put("pid", "1");
 		rootAttr.put("bid", "1");
@@ -99,10 +102,24 @@ public class SysResourceMenusServiceImpl extends BaseServiceImpl<SysResourceMenu
 			JsTree chlidren = new JsTree();
             chlidren.setId(item.getId().toString());
             chlidren.setText(item.getMenuName());
+        	ConcurrentMap<String, Object> chlidrenAttr = new ConcurrentHashMap<>();
+        	chlidrenAttr.put("pid", item.getParentMenuNumber());
+        	chlidrenAttr.put("bid", item.getMenuNumber());
+    		chlidren.setA_attr(chlidrenAttr);
             root.add(chlidren);
             JsTree chlid = chlidrens(root, item.getMenuNumber());
 		});
 		return root;
+	}
+
+	@Override
+	public CopyOnWriteArrayList<SysResourceMenusEntity> selectByForm(SysResourceMenusEntity form) {
+		return this.sysResourceMenusDao.selectByForm(form);
+	}
+
+	@Override
+	public CopyOnWriteArrayList<SysResourceMenusEntity> selectByMenuTypeNotIn() {
+		return this.sysResourceMenusDao.selectByMenuTypeNotIn();
 	}
 
 	

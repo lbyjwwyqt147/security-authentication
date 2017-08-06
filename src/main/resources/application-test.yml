@@ -9,7 +9,7 @@ druid:
    slaveSize: 1
    #主库
    master:
-        url: jdbc:mysql://127.0.0.1:3306/background_security?useUnicode=true&characterEncoding=UTF-8
+        url: jdbc:mysql://127.0.0.1:3306/background_security?useUnicode=true&characterEncoding=UTF-8&useSSL=false
         username: root
         password: root@123
         driver-class-name: com.mysql.jdbc.Driver
@@ -33,7 +33,7 @@ druid:
         logAbandoned: true
    #从库
    slaveOne:
-        url: jdbc:mysql://127.0.0.1:3306/background_security?useUnicode=true&characterEncoding=UTF-8
+        url: jdbc:mysql://127.0.0.1:3306/background_security?useUnicode=true&characterEncoding=UTF-8&useSSL=false
         username: root
         password: root@123
         driver-class-name: com.mysql.jdbc.Driver

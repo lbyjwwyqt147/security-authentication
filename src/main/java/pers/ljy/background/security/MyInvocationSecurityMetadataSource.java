@@ -45,20 +45,26 @@ public class MyInvocationSecurityMetadataSource implements FilterInvocationSecur
      */
     @PostConstruct
     public void loadResourceDefine() {
-        if (resourceMap == null) {
-            resourceMap = new ConcurrentHashMap<>();
-            //获取全部系统菜单资源信息
-            CopyOnWriteArrayList<SysResourceMenusEntity> resources = sysResourceMenusService.selectAll();
-            for (SysResourceMenusEntity resource : resources) {
-                Collection<ConfigAttribute> configAttributes = new CopyOnWriteArrayList<ConfigAttribute>();
-                //和类：MyUserDetailService 的       authSet.add(new SimpleGrantedAuthority(sysResourceMenusEntity.getAuthorizedSigns()))参数 一致
-                ConfigAttribute configAttribute = new SecurityConfig(resource.getAuthorizedSigns());
-                configAttributes.add(configAttribute);
-                //资源模块对应的url 地址
-                resourceMap.put(resource.getMenuUrl(), configAttributes);
-            }
-        }
-        LOGGER.info(" 开始加载资源与权限的对应关系!!!");
+        LOGGER.info(" web容器启动时就会 开始加载资源与权限的对应关系!!!");
+    	try {
+    		   if (resourceMap == null) {
+    	            resourceMap = new ConcurrentHashMap<>();
+    	            //容器启动时,获取全部系统菜单资源信息
+    	            CopyOnWriteArrayList<SysResourceMenusEntity> resources = sysResourceMenusService.selectByMenuTypeNotIn();
+    	            for (SysResourceMenusEntity resource : resources) {
+    	                Collection<ConfigAttribute> configAttributes = new CopyOnWriteArrayList<ConfigAttribute>();
+    	                //和类：MyUserDetailService 的       authSet.add(new SimpleGrantedAuthority(sysResourceMenusEntity.getAuthorizedSigns()))参数 一致
+    	                ConfigAttribute configAttribute = new SecurityConfig(resource.getAuthorizedSigns());
+    	                configAttributes.add(configAttribute);
+    	                //资源模块对应的url 地址
+    	                resourceMap.put(resource.getMenuUrl(), configAttributes);
+    	            }
+    	        }
+		} catch (Exception e) {
+			e.printStackTrace();
+			 LOGGER.info(" 开始加载资源与权限的对应关系出现异常!!!");
+		}
+     
     }
 
 	

@@ -27,6 +27,20 @@ public interface SysResourceMenusService  extends BaseService<SysResourceMenusEn
 	CopyOnWriteArrayList<SysResourceMenusEntity> selectByPid(String pid);
 	
 	/**
+	 * 获取菜单和按钮 资源信息
+	 * @param pid
+	 * @return
+	 */
+	CopyOnWriteArrayList<SysResourceMenusEntity> selectByMenuTypeNotIn();
+	
+	/**
+	 * 根据不同条件查询数据
+	 * @param form
+	 * @return
+	 */
+	CopyOnWriteArrayList<SysResourceMenusEntity> selectByForm(SysResourceMenusEntity form);
+	
+	/**
 	 * 获取最大值
 	 * @param pid
 	 * @return
@@ -46,4 +60,6 @@ public interface SysResourceMenusService  extends BaseService<SysResourceMenusEn
 	 * @return
 	 */
     JsTree menusTree(String pid);
+    
+    
 }

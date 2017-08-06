@@ -193,5 +193,32 @@
     from sys_resource_menus
     where parent_menu_number_ = #{pid,jdbcType=VARCHAR}
   </select>
+     <!-- 根据不同条件获取数据 -->
+  <select id="selectByForm" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from sys_resource_menus
+    where 1 = 1
+      <if test="menuNumber != null" >
+       AND menu_number_ = #{menuNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="menuType != null" >
+       AND menu_type_ = #{menuType,jdbcType=CHAR},
+      </if>
+      <if test="parentMenuNumber != null" >
+        AND parent_menu_number_ = #{parentMenuNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        AND status_ = #{status,jdbcType=CHAR},
+      </if>
+  </select>
+  
+     <!-- 获取菜单和按钮 资源信息 -->
+  <select id="selectByMenuTypeNotIn" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from sys_resource_menus
+    where menu_type_ != '1001'
+  </select>
  
 </mapper>

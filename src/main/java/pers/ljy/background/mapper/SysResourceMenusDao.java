@@ -28,6 +28,20 @@ public interface SysResourceMenusDao extends BaseDao<SysResourceMenusEntity, Int
 	CopyOnWriteArrayList<SysResourceMenusEntity> selectByPid(String pid);
 	
 	/**
+	 * 获取菜单和按钮 资源信息
+	 * @param pid
+	 * @return
+	 */
+	CopyOnWriteArrayList<SysResourceMenusEntity> selectByMenuTypeNotIn();
+	
+	/**
+	 * 根据不同条件查询数据
+	 * @param form
+	 * @return
+	 */
+	CopyOnWriteArrayList<SysResourceMenusEntity> selectByForm(SysResourceMenusEntity form);
+	
+	/**
 	 * 获取最大编号值
 	 * @param pid
 	 * @return
