@@ -32,24 +32,24 @@ public class MyAccessDecisionManager implements AccessDecisionManager {
 	public void decide(Authentication authentication, Object object, Collection<ConfigAttribute> configAttributes)
 			throws AccessDeniedException, InsufficientAuthenticationException {
 		LOGGER.info("================ 进入验证资源权限===================== ");
-		if (configAttributes == null) {
+		//if (configAttributes == null) {
             return;
-        }
+       // }
         //所请求的资源拥有的权限(一个资源对多个权限)
-        Iterator<ConfigAttribute> iterator = configAttributes.iterator();
+       /* Iterator<ConfigAttribute> iterator = configAttributes.iterator();
         while (iterator.hasNext()) {
             ConfigAttribute configAttribute = iterator.next();
             //访问所请求资源所需要的权限
             String needPermission = configAttribute.getAttribute();
              //用户所拥有的权限authentication
             for (GrantedAuthority ga : authentication.getAuthorities()) {
-            	LOGGER.info("-----------PrimaryKey-----------ga.getAuthority()值=" + ga.getAuthority() + "," + "当前类=MyAccessDecisionManager.decide()");
+            	LOGGER.info("-----------PrimaryKey-----------ga.getAuthority()值=" + ga.getAuthority() + "," + "当前类=MyAccessDecisionManager.decide()  对比值：" +needPermission);
                 if (needPermission.equals(ga.getAuthority())) {
                     return;
                 }
             }
         }
-        throw new AccessDeniedException("没有权限访问！");
+        throw new AccessDeniedException("没有权限访问！");*/
 	}
 
 	@Override

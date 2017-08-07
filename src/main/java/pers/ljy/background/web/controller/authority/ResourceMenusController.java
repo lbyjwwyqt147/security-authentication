@@ -49,7 +49,7 @@ public class ResourceMenusController extends BasicController {
 	@SystemControllerLog(description="菜单资源列表")
 	@GetMapping(value="/resourceMenus")
 	public ApiResultView list(@RequestParam(value="pid",required=true) String pid){
-		CopyOnWriteArrayList<SysResourceMenusEntity> list = this.resourceMenusService.selectAll();
+		CopyOnWriteArrayList<SysResourceMenusEntity> list = this.resourceMenusService.selectByPid(pid);
 		return this.buildDataPacket(list);
 	}
 	

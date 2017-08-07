@@ -55,9 +55,9 @@ public class SysResourceMenusServiceImpl extends BaseServiceImpl<SysResourceMenu
 	public String newestNumber(String pid) {
 		StringBuffer newestNumberBuffer = new StringBuffer();
 		String maxPid = this.selectMaxPid(pid);
-		if(StringUtils.isEmpty(pid)){
+		if(StringUtils.isEmpty(maxPid)){
 			newestNumberBuffer.append(pid).append("1001");
-		}else if(pid.trim().equals("1")){
+		}else if(pid.trim().equals("1") && StringUtils.isEmpty(maxPid)){
 			newestNumberBuffer.append("1001");
 		}else {
 			AtomicLong number = new AtomicLong(Long.valueOf(maxPid));
@@ -96,6 +96,12 @@ public class SysResourceMenusServiceImpl extends BaseServiceImpl<SysResourceMenu
 		return root;
 	}
 	
+	/**
+	 * 递归构建树结构
+	 * @param root
+	 * @param pid
+	 * @return
+	 */
 	private JsTree chlidrens(JsTree root,String pid){
 		CopyOnWriteArrayList<SysResourceMenusEntity> chlidrenList = this.selectByPid(pid);
 		chlidrenList.forEach(item -> {
@@ -106,8 +112,9 @@ public class SysResourceMenusServiceImpl extends BaseServiceImpl<SysResourceMenu
         	chlidrenAttr.put("pid", item.getParentMenuNumber());
         	chlidrenAttr.put("bid", item.getMenuNumber());
     		chlidren.setA_attr(chlidrenAttr);
-            root.add(chlidren);
-            JsTree chlid = chlidrens(root, item.getMenuNumber());
+    		root.add(chlidren);
+    		//递归
+            chlidrens(chlidren, item.getMenuNumber());            
 		});
 		return root;
 	}
