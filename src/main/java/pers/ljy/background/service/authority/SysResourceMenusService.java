@@ -61,5 +61,49 @@ public interface SysResourceMenusService  extends BaseService<SysResourceMenusEn
 	 */
     JsTree menusTree(String pid);
     
+    /**
+     * 角色分配的资源
+     * @param roleId
+     * @return
+     */
+    JsTree roleMenusIn(Integer roleId);
+    
+    /**
+     * 角色未分配的资源
+     * @param roleId
+     * @return
+     */
+    JsTree roleMenusNotIn(Integer roleId);
+    
+    /**
+     * 获取用户拥有的资源菜单
+     * @param userId
+     * @param token
+     * @return
+     */
+    CopyOnWriteArrayList<JsTree> userMenus(String userId,String token);
+    
+    /**
+	 * 根据PID 模糊匹配查询
+	 * @param pid
+	 * @return
+	 */
+	CopyOnWriteArrayList<SysResourceMenusEntity> selectByPidLike(String pid);
+	
+	/**
+	 * 角色已分配资源列表
+	 * @param roleId
+	 * @return
+	 */
+	CopyOnWriteArrayList<SysResourceMenusEntity> selectByRoleIdIn(Integer roleId,String menuType);
+	
+	/**
+	 * 角色未分配资源列表
+	 * @param roleId
+	 * @return
+	 */
+	CopyOnWriteArrayList<SysResourceMenusEntity> selectByRoleIdNotIn(Integer roleId);
+	
+    
     
 }

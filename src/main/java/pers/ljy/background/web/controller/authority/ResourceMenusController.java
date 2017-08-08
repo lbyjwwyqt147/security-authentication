@@ -89,4 +89,41 @@ public class ResourceMenusController extends BasicController {
 		return this.buildListsData(list);
 
 	}
+	
+
+	/**
+	 * 已分配资源
+	 * @param roleId
+	 * @return
+	 */
+	@GetMapping(value="/resourceMenus/y")
+	public String treey(@RequestParam(value="roleId",required=true)Integer roleId){
+		JsTree tree = this.resourceMenusService.roleMenusIn(roleId);
+		List<JsTree> list = new ArrayList<>();
+		list.add(tree);
+		return this.buildListsData(list);
+	}
+	
+	/**
+	 * 未分配资源
+	 * @param roleId
+	 * @return
+	 */
+	@GetMapping(value="/resourceMenus/n")
+	public String treen(@RequestParam(value="roleId",required=true)Integer roleId){
+		JsTree tree = this.resourceMenusService.roleMenusNotIn(roleId);
+		List<JsTree> list = new ArrayList<>();
+		list.add(tree);
+		return this.buildListsData(list);
+	}
+	
+	/**
+	 * 用户所属的资源菜单
+	 * @param roleId
+	 * @return
+	 */
+	@GetMapping(value="/resourceMenus/user")
+	public String userMenus(){
+		return this.buildListsData(this.resourceMenusService.userMenus("", ""));
+	}
 }

@@ -39,7 +39,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
      protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable()   //关闭 csrf
                 .authorizeRequests()
-                .antMatchers( "/security/api/v1/users/logins","/security/api/v1/users/signins","/security/api/v1/users","/security/api/v1/roles","/security/api/v1/userRolers","/security/api/v1/userRolers/y","/security/api/v1/userRolers/n","/security/api/v1/resourceMenus","/security/api/v1/resourceMenus/*","/security/api/v1/roleMenus/*","/security/api/v1/roleMenus/*")
+                .antMatchers( "/security/api/v1/users/logins","/security/api/v1/users/signins","/security/api/v1/users","/security/api/v1/roles","/security/api/v1/userRolers","/security/api/v1/userRolers/y","/security/api/v1/userRolers/n","/security/api/v1/resourceMenus","/security/api/v1/resourceMenus/*","/security/api/v1/roleMenus","/security/api/v1/roleMenus/*")
                 .permitAll()//访问：这些路径 无需登录认证权限
                 .anyRequest().authenticated() //其他所有资源都需要认证，登陆后访问
                 //.antMatchers("/resources").hasAuthority("ADMIN") //登陆后之后拥有“ADMIN”权限才可以访问/hello方法，否则系统会出现“403”权限不足的提示

@@ -4,6 +4,8 @@ package pers.ljy.background.mapper;
 
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.apache.ibatis.annotations.Param;
+
 import pers.ljy.background.model.SysResourceMenusEntity;
 import pers.ljy.background.share.dao.BaseDao;
 
@@ -47,4 +49,27 @@ public interface SysResourceMenusDao extends BaseDao<SysResourceMenusEntity, Int
 	 * @return
 	 */
 	String selectMaxPid(String pid);
+	
+	/**
+	 * 根据PID 模糊匹配查询
+	 * @param pid
+	 * @return
+	 */
+	CopyOnWriteArrayList<SysResourceMenusEntity> selectByPidLike(String pid);
+	
+	/**
+	 * 角色已分配资源列表
+	 * @param roleId
+	 * @param menuType
+	 * @return
+	 */
+	CopyOnWriteArrayList<SysResourceMenusEntity> selectByRoleIdIn(@Param("roleId")Integer roleId,@Param("menuType")String menuType);
+	
+	/**
+	 * 角色未分配资源列表
+	 * @param roleId
+	 * @return
+	 */
+	CopyOnWriteArrayList<SysResourceMenusEntity> selectByRoleIdNotIn(Integer roleId);
+	
 }

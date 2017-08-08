@@ -34,4 +34,18 @@ public interface SysRoleMenuService extends BaseService<SysRoleMenuEntity, Integ
 	 * @return
 	 */
 	CopyOnWriteArrayList<RoleMenuVo> selectRoleMenuByRoleIdIn(List<Integer> roleIds);
+	
+	/**
+	 * 批量添加
+	 * @param roleId
+	 * @param menusIds
+	 */
+	void batchInset(Integer roleId,CopyOnWriteArrayList<Integer> menusIds);
+	
+	/**
+	 * 批量删除
+	 * @param roleId
+	 * @param menusIds
+	 */
+	void batchDelete(Integer roleId,CopyOnWriteArrayList<Integer> menusIds);
 }

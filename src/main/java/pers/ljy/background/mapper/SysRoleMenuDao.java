@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import pers.ljy.background.model.SysRoleMenuEntity;
 import pers.ljy.background.share.dao.BaseDao;
@@ -37,4 +38,17 @@ public interface SysRoleMenuDao extends BaseDao<SysRoleMenuEntity, Integer>{
 	 * @return
 	 */
 	CopyOnWriteArrayList<RoleMenuVo> selectRoleMenuByRoleIdIn(List<Integer> roleIds);
+	
+	/**
+	 * 批量添加
+	 * @param entityList
+	 */
+	void batchInset(CopyOnWriteArrayList<SysRoleMenuEntity> entityList);
+	
+	/**
+	 * 批量删除
+	 * @param roleId
+	 * @param menusIds
+	 */
+	void batchDelete(@Param("roleId")Integer roleId,@Param("menusIds")CopyOnWriteArrayList<Integer> menusIds);
 }

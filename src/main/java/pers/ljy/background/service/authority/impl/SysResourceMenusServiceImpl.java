@@ -1,5 +1,6 @@
 package pers.ljy.background.service.authority.impl;
 
+
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -71,7 +72,6 @@ public class SysResourceMenusServiceImpl extends BaseServiceImpl<SysResourceMenu
 	public JsTree menusTree(String pid) {
 		JsTree root = new JsTree();
 		root.setId("-1");
-		//root.setParent("-1");
 		//root.setText("资源菜单");
 		root.setText("root");
 		JsTreeState jsTreeState = new JsTreeState();
@@ -81,16 +81,7 @@ public class SysResourceMenusServiceImpl extends BaseServiceImpl<SysResourceMenu
 		rootAttr.put("pid", "1");
 		rootAttr.put("bid", "1");
 		root.setA_attr(rootAttr);
-		
 		root.setState(jsTreeState);
-		
-		
-		JsTree tree1 =  new JsTree();
-		tree1.setId("-2");
-	//	tree1.setParent("-2");
-		tree1.setText("节点1");
-		
-		//root.add(tree1);
 		chlidrens(root,pid);
 		
 		return root;
@@ -128,6 +119,116 @@ public class SysResourceMenusServiceImpl extends BaseServiceImpl<SysResourceMenu
 	public CopyOnWriteArrayList<SysResourceMenusEntity> selectByMenuTypeNotIn() {
 		return this.sysResourceMenusDao.selectByMenuTypeNotIn();
 	}
+
+	@Override
+	public CopyOnWriteArrayList<SysResourceMenusEntity> selectByPidLike(String pid) {
+		return this.sysResourceMenusDao.selectByPidLike(pid);
+	}
+
+	@Override
+	public CopyOnWriteArrayList<SysResourceMenusEntity> selectByRoleIdIn(Integer roleId,String menuType) {
+		return this.sysResourceMenusDao.selectByRoleIdIn(roleId,menuType);
+	}
+
+	@Override
+	public CopyOnWriteArrayList<SysResourceMenusEntity> selectByRoleIdNotIn(Integer roleId) {
+		return this.sysResourceMenusDao.selectByRoleIdNotIn(roleId);
+	}
+
+	@Override
+	public JsTree roleMenusIn(Integer roleId) {
+		CopyOnWriteArrayList<SysResourceMenusEntity> list = this.selectByRoleIdIn(roleId,null);
+		JsTree jsTree = this.roleMenus(list);
+		return jsTree;
+	}
+
+	@Override
+	public JsTree roleMenusNotIn(Integer roleId) {
+		CopyOnWriteArrayList<SysResourceMenusEntity> list = this.selectByRoleIdNotIn(roleId);
+		JsTree jsTree = this.roleMenus(list);
+		return jsTree;
+	}
+	
+	/**
+	 * 构建角色资源树
+	 * @param list
+	 * @return
+	 */
+	private JsTree roleMenus(CopyOnWriteArrayList<SysResourceMenusEntity> list){
+		JsTree root = new JsTree();
+		root.setId("-1");
+		//root.setText("资源菜单");
+		root.setText("root");
+		JsTreeState jsTreeState = new JsTreeState();
+		jsTreeState.setOpened(true);
+		jsTreeState.setDisabled(true);
+		root.setState(jsTreeState);
+		
+		if(list != null && !list.isEmpty()){
+			list.forEach(it -> {
+				if(it.getParentMenuNumber().equals("1")){
+					JsTree chlidren = new JsTree();
+		            chlidren.setId(it.getId().toString());
+		            chlidren.setText(it.getMenuName());
+		        	ConcurrentMap<String, Object> chlidrenAttr = new ConcurrentHashMap<>();
+		        	chlidrenAttr.put("pid", it.getParentMenuNumber());
+		        	chlidrenAttr.put("bid", it.getMenuNumber());
+		    		chlidren.setA_attr(chlidrenAttr);
+		    		root.add(findChildren(chlidren, list));
+				}
+			});
+			
+		}
+		return root;
+	}
+	
+	/** 
+     * 递归查找子节点 
+     * @param treeNodes 
+     * @return 
+     */  
+    @SuppressWarnings("unchecked")
+	public static JsTree findChildren(JsTree treeNode,CopyOnWriteArrayList<SysResourceMenusEntity> list) {  
+        ConcurrentMap<String, Object> attrMap = (ConcurrentMap<String, Object>) treeNode.getA_attr();
+        list.forEach(it -> { 
+            if(attrMap.get("bid").equals(it.getParentMenuNumber())) {  
+            	JsTree chlidren = new JsTree();
+	            chlidren.setId(it.getId().toString());
+	            chlidren.setText(it.getMenuName());
+	            chlidren.setIcon(it.getMenuIcon());
+	        	ConcurrentMap<String, Object> chlidrenAttr = new ConcurrentHashMap<>();
+	        	chlidrenAttr.put("pid", it.getParentMenuNumber());
+	        	chlidrenAttr.put("bid", it.getMenuNumber());
+	        	chlidrenAttr.put("parentId", treeNode.getId());
+	    		chlidren.setA_attr(chlidrenAttr); 
+                treeNode.add(findChildren(chlidren,list));  
+            }  
+        });  
+        return treeNode;  
+    }
+
+	@Override
+	public CopyOnWriteArrayList<JsTree> userMenus(String userId, String token) {
+		CopyOnWriteArrayList<JsTree> userMenusList = new CopyOnWriteArrayList<>();
+		CopyOnWriteArrayList<SysResourceMenusEntity> list = this.selectByRoleIdIn(1,"1002");
+		if(list != null && !list.isEmpty()){
+			list.forEach(it -> {
+				if(it.getParentMenuNumber().equals("1")){
+					JsTree chlidren = new JsTree();
+		            chlidren.setId(it.getId().toString());
+		            chlidren.setText(it.getMenuName());
+		            chlidren.setIcon(it.getMenuIcon());
+		        	ConcurrentMap<String, Object> chlidrenAttr = new ConcurrentHashMap<>();
+		        	chlidrenAttr.put("pid", it.getParentMenuNumber());
+		        	chlidrenAttr.put("bid", it.getMenuNumber());
+		    		chlidren.setA_attr(chlidrenAttr);
+		    		userMenusList.add(findChildren(chlidren, list));
+				}
+			});
+			
+		}
+		return userMenusList;
+	}  
 
 	
 }
