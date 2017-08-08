@@ -3,7 +3,16 @@ package pers.ljy.background.web.controller.user;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import pers.ljy.background.model.SysUsersAccountEntity;
 import pers.ljy.background.service.user.SysUsersAccountService;
 import pers.ljy.background.share.dto.PageForm;
+import pers.ljy.background.share.exception.BusinessException;
 import pers.ljy.background.share.logs.SystemControllerLog;
 import pers.ljy.background.share.result.ApiResultCode;
 import pers.ljy.background.share.result.ApiResultView;
@@ -33,6 +43,8 @@ import pers.ljy.background.web.vo.user.UsersAccountVo;
 public class UserAccountController extends BasicController {
 	@Autowired
     private SysUsersAccountService usersAccountService;
+	@Autowired
+	private AuthenticationManager myAuthenticationManager;
 	
 	/**
 	 * 用户注册
@@ -59,15 +71,32 @@ public class UserAccountController extends BasicController {
 	 */
 	@RequestMapping(value="/users/logins")
 	@SystemControllerLog(description = "用户登录") 
-	public ApiResultView logins(String userName){
+	public ApiResultView logins(String userName,String userPwd,HttpServletRequest request,HttpServletResponse response,HttpSession httpSession){
 		UsersAccountVo usersAccountVo =  new UsersAccountVo();
 		usersAccountVo.setUserName(userName);
+		usersAccountVo.setUserPwd(userPwd);
 		int status = ApiResultCode.FAIL.getCode();
 		String msg = "登录失败.";
 		SysUsersAccountEntity accountEntity  = this.usersAccountService.selectUsersAccount(usersAccountVo.getUserName());
 		if(accountEntity != null){
+			// 这句代码会自动执行咱们自定义的 ```MyUserDetailService.java``` 类
+			//AuthenticationManager myAuthenticationManager = new 
+	        Authentication authentication = myAuthenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userName, userPwd));
+	        if (!authentication.isAuthenticated()) {
+	            throw new BusinessException("Unknown username or password");
+	        }
+	        SecurityContext securityContext = SecurityContextHolder.getContext();
+	        securityContext.setAuthentication(authentication);
+	        httpSession.setAttribute("SPRING_SECURITY_CONTEXT", SecurityContextHolder.getContext());
+	        httpSession.setAttribute("SESSION_OPERATOR", accountEntity);
+				    
+	        
 			status = ApiResultCode.SUCCESS.getCode();
 			msg = "登录成功.";
+			
+			
+
+
 		}
 		return this.buildRestful(status, msg, null);
 	}

@@ -46,7 +46,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
          .and()
                 .formLogin()
                 .loginPage("/")//指定登录页是”/”
-                .loginProcessingUrl("/security/api/v1/users/logins") //登录处理url
+                //.loginProcessingUrl("/security/api/v1/users/logins") //登录处理url
+                .loginProcessingUrl("/users/logins")
                 .usernameParameter("userName") //登录用户
                 .passwordParameter("userPwd") //登录密码
                 .defaultSuccessUrl("http://localhost:63342/access/pages/index.html?_ijt=n5afdotmh10bc7i9lg053v3h0r")  //登录成功路径

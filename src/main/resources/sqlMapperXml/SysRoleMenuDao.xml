@@ -13,7 +13,7 @@
     <id column="id_" jdbcType="INTEGER" property="id" />
     <result column="role_id_" jdbcType="INTEGER" property="roleId" />
     <result column="menu_id_" jdbcType="INTEGER" property="menuId" />
-    <collection property="userRoleList" column="userId" ofType="pers.ljy.background.model.SysResourceMenusEntity">    
+    <collection property="resourceMenusList" column="userId" ofType="pers.ljy.background.model.SysResourceMenusEntity">    
         <id column="id_" jdbcType="INTEGER" property="id" />
 	    <result column="menu_number_" jdbcType="VARCHAR" property="menuNumber" />
 	    <result column="menu_name_" jdbcType="VARCHAR" property="menuName" />
@@ -130,7 +130,7 @@
   <select id="selectRoleMenuByRoleIdIn" resultMap="RoleMenuResultMap">
     select 
     <include refid="ROLE_MENU_Column_List" />
-    from sys_role_menu r,sys_resource_menus m  where r.menu_id_ = m.id_ AND r.role_id_  in 
+    from sys_role_menu r,sys_resource_menus m  where r.menu_id_ = m.id_ AND m.menu_type_ != '1001' AND r.role_id_  in 
     <foreach item="item" index="index" collection="list" open="(" separator="," close=")">  
 	  #{item}  
 	</foreach>  

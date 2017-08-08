@@ -26,6 +26,7 @@ import pers.ljy.background.service.authority.SysRoleMenuService;
 import pers.ljy.background.service.authority.SysRoleService;
 import pers.ljy.background.service.authority.SysUserRoleService;
 import pers.ljy.background.service.user.SysUsersAccountService;
+import pers.ljy.background.share.exception.BusinessException;
 import pers.ljy.background.web.vo.authority.RoleMenuVo;
 
 /***
@@ -71,25 +72,36 @@ public class MyUserDetailService implements UserDetailsService {
 		}
 		
 		// 取得用户的权限
-		CopyOnWriteArrayList<SysUserRoleEntity> userRoleList = this.userRoleService.selectUserRoleByUserId(users.getId());
-        Collection<GrantedAuthority> grantedAuths = obtionGrantedAuthorities(users,userRoleList);
-        Set<GrantedAuthority> grantedAuthorities = new HashSet<GrantedAuthority>();
-        List<Integer> roleIdsList = new ArrayList<>();
-        for (SysUserRoleEntity role : userRoleList) {
-        	roleIdsList.add(role.getRoleId());
-        }
-        CopyOnWriteArrayList<SysRoleEntity> roleEntitieList = this.roleService.selectByPrimaryKeyIn(roleIdsList);
-        for (SysRoleEntity sysRoleEntity : roleEntitieList) {
-            grantedAuthorities.add(new SimpleGrantedAuthority(sysRoleEntity.getRoleName()));
+		CopyOnWriteArrayList<SysUserRoleEntity> userRoleList = this.userRoleService.selectUserRoleByUserId(users.getUserId());
+		if(userRoleList == null){
+			throw new BusinessException("你没有权限登录!");
 		}
-        // 封装成spring security的user
-        User userDetail = new User(users.getUserName(), users.getUserPwd(),
-                true,//是否可用
-                true,//是否过期
-                true,//证书不过期为true
-                true,//账户未锁定为true ,
-                grantedAuths);
-        return userDetail;
+		try {
+			   Collection<GrantedAuthority> grantedAuths = obtionGrantedAuthorities(users,userRoleList);
+		        Set<GrantedAuthority> grantedAuthorities = new HashSet<GrantedAuthority>();
+		        List<Integer> roleIdsList = new ArrayList<>();
+		        for (SysUserRoleEntity role : userRoleList) {
+		        	roleIdsList.add(role.getRoleId());
+		        }
+		        CopyOnWriteArrayList<SysRoleEntity> roleEntitieList = this.roleService.selectByPrimaryKeyIn(roleIdsList);
+		        for (SysRoleEntity sysRoleEntity : roleEntitieList) {
+		            grantedAuthorities.add(new SimpleGrantedAuthority(sysRoleEntity.getRoleName()));
+				}
+		        // 封装成spring security的user
+		        User userDetail = new User(users.getUserName(), users.getUserPwd(),
+		                true,//是否可用
+		                true,//是否过期
+		                true,//证书不过期为true
+		                true,//账户未锁定为true ,
+		                grantedAuths);
+		        return userDetail;
+		} catch (Exception e) {
+			e.printStackTrace();
+			LOGGER.error("登录权限效验出现异常.");
+			return null;
+		}
+     
+      
 	}
 	
 	/**
