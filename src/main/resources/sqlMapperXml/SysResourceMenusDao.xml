@@ -213,12 +213,46 @@
       </if>
   </select>
   
-     <!-- 获取菜单和按钮 资源信息 -->
+  <!-- 获取菜单和按钮 资源信息 -->
   <select id="selectByMenuTypeNotIn" resultMap="BaseResultMap">
     select
     <include refid="Base_Column_List" />
     from sys_resource_menus
-    where menu_type_ != '1001'
+    where  menu_type_ != '1001'
   </select>
+  
+  
+   <!-- 根据PID 模糊匹配查询-->
+  <select id="selectByPidLike" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from sys_resource_menus
+    where parent_menu_number_ like CONCAT("%",#{pid},"")
+  </select>
+  
+  
+  
+   <!-- 角色已分配资源列表-->
+  <select id="selectByRoleIdIn" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from sys_resource_menus r
+    where exists (select menu_id_ from sys_role_menu m where m.role_id_ = #{roleId,jdbcType=INTEGER} and m.menu_id_ = r.id_)
+    <if test="menuType != null">
+      and  r.menu_type_ != '1003'
+    </if> 
+  </select>
+  
+  
+  
+   <!-- 角色未分配资源列表 -->
+  <select id="selectByRoleIdNotIn" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from sys_resource_menus r
+    where not exists (select menu_id_ from sys_role_menu where role_id_ = #{roleId,jdbcType=INTEGER} and menu_id_ = r.id_) 
+  </select>
+  
+  
  
 </mapper>
