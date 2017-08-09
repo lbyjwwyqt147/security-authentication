@@ -171,6 +171,12 @@
     <include refid="Base_Column_List" />
     from sys_users_account  where user_name_ = #{userName,jdbcType=VARCHAR}
   </select>
+  <!-- 根据用户名,密码 查询账户信息-->
+  <select id="selectUsersAccountByUserNameAndByUserPwd" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from sys_users_account  where user_name_ = #{userName,jdbcType=VARCHAR} and user_pwd_ = #{userPwd,jdbcType=VARCHAR}
+  </select>
   <!-- 根据帐号获取帐号信息和对于的角色-->
   <select id="selectUsersAccountRoles" resultMap="UserRoleResultMap">
     select
