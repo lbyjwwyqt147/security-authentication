@@ -13,6 +13,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -44,7 +45,9 @@ public class UserAccountController extends BasicController {
 	@Autowired
     private SysUsersAccountService usersAccountService;
 	@Autowired
-	private AuthenticationManager myAuthenticationManager;
+	private AuthenticationManager authenticationManager;
+	@Autowired
+	private BCryptPasswordEncoder passwordEncoder;
 	
 	/**
 	 * 用户注册
@@ -71,34 +74,48 @@ public class UserAccountController extends BasicController {
 	 */
 	@RequestMapping(value="/users/logins")
 	@SystemControllerLog(description = "用户登录") 
-	public ApiResultView logins(String userName,String userPwd,HttpServletRequest request,HttpServletResponse response,HttpSession httpSession){
-		UsersAccountVo usersAccountVo =  new UsersAccountVo();
-		usersAccountVo.setUserName(userName);
-		usersAccountVo.setUserPwd(userPwd);
+	public ApiResultView logins(String userName,String userPwd,HttpServletRequest request,HttpServletResponse response){
 		int status = ApiResultCode.FAIL.getCode();
 		String msg = "登录失败.";
-		SysUsersAccountEntity accountEntity  = this.usersAccountService.selectUsersAccount(usersAccountVo.getUserName());
+     
+		SysUsersAccountEntity accountEntity  = this.usersAccountService.selectUsersAccount(userName);
 		if(accountEntity != null){
-			// 这句代码会自动执行咱们自定义的 ```MyUserDetailService.java``` 类
-			//AuthenticationManager myAuthenticationManager = new 
-	        Authentication authentication = myAuthenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userName, userPwd));
-	        if (!authentication.isAuthenticated()) {
-	            throw new BusinessException("Unknown username or password");
+			if (!passwordEncoder.matches(userPwd, accountEntity.getUserPwd())) {
+				 throw new BusinessException("未知的用户名或者密码!");
 	        }
+			
+            //身份认证
+			// 这句代码会自动执行咱们自定义的 "MyUserDetailService.java" 类
+			//1: 将用户名和密码封装成token  new UsernamePasswordAuthenticationToken(userName, userPwd)
+			//2: 将token传给AuthenticationManager进行身份认证   authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userName, userPwd));
+			//3: 认证完毕，返回一个认证后的身份： Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userName, userPwd));
+			//4: 认证后，存储到SecurityContext里   SecurityContext securityContext = SecurityContextHolder.getContext();securityContext.setAuthentication(authentication);
+			
+			//UsernamePasswordAuthenticationToken继承AbstractAuthenticationToken实现Authentication
+			//当在页面中输入用户名和密码之后首先会进入到UsernamePasswordAuthenticationToken验证(Authentication)，注意用户名和登录名都是页面传来的值
+			//然后生成的Authentication会被交由AuthenticationManager来进行管理
+			//而AuthenticationManager管理一系列的AuthenticationProvider，
+			//而每一个Provider都会通UserDetailsService和UserDetail来返回一个
+			//以UsernamePasswordAuthenticationToken实现的带用户名和密码以及权限的Authentication
+	        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userName, userPwd));
+	        if (!authentication.isAuthenticated()) {
+	            throw new BusinessException("未知的用户名或者密码!");
+	        }
+	        //将身份 存储到SecurityContext里
 	        SecurityContext securityContext = SecurityContextHolder.getContext();
 	        securityContext.setAuthentication(authentication);
-	        httpSession.setAttribute("SPRING_SECURITY_CONTEXT", SecurityContextHolder.getContext());
-	        httpSession.setAttribute("SESSION_OPERATOR", accountEntity);
-				    
 	        
+            request.getSession().setAttribute("SPRING_SECURITY_CONTEXT", securityContext);
+            request.getSession().setAttribute("SESSION_OPERATOR", accountEntity);
+				    	        
 			status = ApiResultCode.SUCCESS.getCode();
 			msg = "登录成功.";
-			
-			
 
+	   }else {
+		   throw new BusinessException("未知的用户名或者密码!");
+	   }
 
-		}
-		return this.buildRestful(status, msg, null);
+	   return this.buildRestful(status, msg, null);
 	}
 	
 	/**

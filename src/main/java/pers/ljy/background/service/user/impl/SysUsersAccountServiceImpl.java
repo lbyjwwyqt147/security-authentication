@@ -7,9 +7,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import pers.ljy.background.mapper.SysUsersAccountDao;
 import pers.ljy.background.model.SysUsersAccountEntity;
 import pers.ljy.background.model.UserInfoEntity;
@@ -41,6 +41,8 @@ public class SysUsersAccountServiceImpl extends BaseServiceImpl<SysUsersAccountE
 	private SysUsersAccountDao sysUsersAccountDao;
 	@Autowired
 	private UserInfoService userInfoService;
+	@Autowired
+	private BCryptPasswordEncoder passwordEncoder;
 
 	@Override
 	public BaseDao<SysUsersAccountEntity, Integer> getDao() {
@@ -70,6 +72,8 @@ public class SysUsersAccountServiceImpl extends BaseServiceImpl<SysUsersAccountE
             throw new BusinessException("密码不能为空.");
 		}
         try {
+            String pwd = passwordEncoder.encode(usersAccountVo.getUserPwd().trim());
+            usersAccountVo.setUserPwd(pwd);
     		//用户信息
     		UserInfoEntity userInfo = DozerMapper.map(usersAccountVo, UserInfoEntity.class);
     		String userNumber = String.valueOf(System.nanoTime());
@@ -81,6 +85,7 @@ public class SysUsersAccountServiceImpl extends BaseServiceImpl<SysUsersAccountE
     		account.setUserId(userId);
     		account.setUserNumber(userNumber);
     		account.setCreateDate(new Date());
+    		
     		int count = this.sysUsersAccountDao.insert(account);
     		if(count > 0){
     			success.set(true);
@@ -91,6 +96,12 @@ public class SysUsersAccountServiceImpl extends BaseServiceImpl<SysUsersAccountE
 		}
 
 		return success;
+	}
+
+
+	@Override
+	public SysUsersAccountEntity selectUsersAccountByUserNameAndByUserPwd(String userName, String pwd) {	
+		return this.sysUsersAccountDao.selectUsersAccountByUserNameAndByUserPwd(userName, pwd);
 	}
 
 	

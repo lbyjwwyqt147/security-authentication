@@ -40,4 +40,13 @@ public interface SysUsersAccountService extends BaseService<SysUsersAccountEntit
 	 * @return
 	 */
 	AtomicBoolean registeredSave(UsersAccountVo usersAccountVo);
+	
+	/**
+	 * 根据用户名,密码 查询账户信息
+	 * @param userName  用户名
+	 * @param pwd       密码
+	 * @return
+	 */
+	SysUsersAccountEntity selectUsersAccountByUserNameAndByUserPwd(String userName,String pwd);
+	
 }

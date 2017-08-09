@@ -28,6 +28,17 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
      public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
      }
+     
+    /* @Override
+     public void configure(WebSecurity web) throws Exception {
+         // javaconfig 配置是这样 set 进去的.
+         web.securityInterceptor(myFilterSecurityInterceptor);
+         web.privilegeEvaluator(customWebInvocationPrivilegeEvaluator());
+         web.
+                 ignoring()
+                 .antMatchers("/assets/**", "/login", "/login/success", "/kaptcha/**", "/**.jsp");
+     }*/
+
 
      @Override  
      public AuthenticationManager authenticationManagerBean() throws Exception {  
@@ -74,10 +85,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
      @Autowired
      public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-        //指定密码加密所使用的加密器为passwordEncoder()
+        //指定密码加密所使用的加密器为 bCryptPasswordEncoder()
         //需要将密码加密后写入数据库
-        auth.userDetailsService(myUserDetailService).passwordEncoder(passwordEncoder());  
-        auth.eraseCredentials(false); 
+    	 auth.userDetailsService(myUserDetailService).passwordEncoder(bCryptPasswordEncoder()); 
+    	 auth.eraseCredentials(false);
      }
 
      @Bean

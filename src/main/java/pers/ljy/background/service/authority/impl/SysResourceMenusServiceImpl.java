@@ -200,6 +200,7 @@ public class SysResourceMenusServiceImpl extends BaseServiceImpl<SysResourceMenu
 	        	chlidrenAttr.put("pid", it.getParentMenuNumber());
 	        	chlidrenAttr.put("bid", it.getMenuNumber());
 	        	chlidrenAttr.put("parentId", treeNode.getId());
+	        	chlidrenAttr.put("url", it.getMenuUrl());
 	    		chlidren.setA_attr(chlidrenAttr); 
                 treeNode.add(findChildren(chlidren,list));  
             }  
@@ -221,6 +222,7 @@ public class SysResourceMenusServiceImpl extends BaseServiceImpl<SysResourceMenu
 		        	ConcurrentMap<String, Object> chlidrenAttr = new ConcurrentHashMap<>();
 		        	chlidrenAttr.put("pid", it.getParentMenuNumber());
 		        	chlidrenAttr.put("bid", it.getMenuNumber());
+		        	chlidrenAttr.put("url", it.getMenuUrl());
 		    		chlidren.setA_attr(chlidrenAttr);
 		    		userMenusList.add(findChildren(chlidren, list));
 				}

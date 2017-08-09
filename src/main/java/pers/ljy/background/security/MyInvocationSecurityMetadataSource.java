@@ -23,6 +23,7 @@ import pers.ljy.background.service.authority.SysResourceMenusService;
  * 文件名称: MyInvocationSecurityMetadataSource.java (系统启动就会加载)
  * 文件描述: 加载资源与权限的对应关系
  * 
+ * 容器启动加载顺序：1：调用loadResourceDefine()方法  2：调用supports()方法   3：调用getAllConfigAttributes()方法
  * 
  * 公 司: 
  * 内容摘要: 
@@ -41,7 +42,7 @@ public class MyInvocationSecurityMetadataSource implements FilterInvocationSecur
 	private SysResourceMenusService sysResourceMenusService;
 	
 	 /**
-     * 加载所有资源与权限的关系，初始化资源变量
+     * 加载所有资源与权限的关系，初始化资源  web容器启动就会执行
      */
     @PostConstruct
     public void loadResourceDefine() {
@@ -73,10 +74,17 @@ public class MyInvocationSecurityMetadataSource implements FilterInvocationSecur
 		return null;
 	}
 
+	/**
+	 * 每次请求后台就会调用 得到请求所拥有的权限
+	 * 这个方法在url请求时才会调用，服务器启动时不会执行这个方法，前提是需要在<http>标签内设置  <custom-filter>标签
+     * getAttributes这个方法会根据你的请求路径去获取这个路径应该是有哪些权限才可以去访问。
+	 * 
+	 */
 	@Override
 	public Collection<ConfigAttribute> getAttributes(Object object) throws IllegalArgumentException {
 		if (resourceMap == null)loadResourceDefine();
-		FilterInvocation filterInvocation = (FilterInvocation) object;  
+		FilterInvocation filterInvocation = (FilterInvocation) object; 
+		// 获取用户请求的url地址
         String requestUrl = filterInvocation.getRequestUrl();
         // 返回当前 url  所需要的权限
         return resourceMap.get(requestUrl);

@@ -2,6 +2,7 @@ package pers.ljy.background.mapper;
 
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import pers.ljy.background.model.SysUsersAccountEntity;
 import pers.ljy.background.share.dao.BaseDao;
@@ -27,6 +28,14 @@ public interface SysUsersAccountDao extends BaseDao<SysUsersAccountEntity, Integ
 	 * @return
 	 */
 	SysUsersAccountEntity selectUsersAccount(String userName);
+	
+	/**
+	 * 根据用户名,密码 查询账户信息
+	 * @param userName  用户名
+	 * @param pwd       密码
+	 * @return
+	 */
+	SysUsersAccountEntity selectUsersAccountByUserNameAndByUserPwd(@Param("userName")String userName,@Param("userPwd")String userPwd);
 	
 	/**
 	 * 根据用户名查询账户信息和对于的角色

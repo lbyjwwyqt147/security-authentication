@@ -1,9 +1,9 @@
 package pers.ljy.background.security;
 
-import java.util.ArrayList;
+
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
+
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -19,7 +19,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import pers.ljy.background.model.SysResourceMenusEntity;
-import pers.ljy.background.model.SysRoleEntity;
 import pers.ljy.background.model.SysUserRoleEntity;
 import pers.ljy.background.model.SysUsersAccountEntity;
 import pers.ljy.background.service.authority.SysRoleMenuService;
@@ -78,27 +77,27 @@ public class MyUserDetailService implements UserDetailsService {
 		}
 		try {
 			   Collection<GrantedAuthority> grantedAuths = obtionGrantedAuthorities(users,userRoleList);
-		        Set<GrantedAuthority> grantedAuthorities = new HashSet<GrantedAuthority>();
-		        List<Integer> roleIdsList = new ArrayList<>();
-		        for (SysUserRoleEntity role : userRoleList) {
-		        	roleIdsList.add(role.getRoleId());
-		        }
-		        CopyOnWriteArrayList<SysRoleEntity> roleEntitieList = this.roleService.selectByPrimaryKeyIn(roleIdsList);
-		        for (SysRoleEntity sysRoleEntity : roleEntitieList) {
-		            grantedAuthorities.add(new SimpleGrantedAuthority(sysRoleEntity.getRoleName()));
-				}
-		        // 封装成spring security的user
-		        User userDetail = new User(users.getUserName(), users.getUserPwd(),
+		       /*Set<GrantedAuthority> grantedAuthorities = new HashSet<GrantedAuthority>();
+		       List<Integer> roleIdsList = new ArrayList<>();
+		       for (SysUserRoleEntity role : userRoleList) {
+		    	   roleIdsList.add(role.getRoleId());
+		       }
+		       CopyOnWriteArrayList<SysRoleEntity> roleEntitieList = this.roleService.selectByPrimaryKeyIn(roleIdsList);
+		       for (SysRoleEntity sysRoleEntity : roleEntitieList) {
+		           grantedAuthorities.add(new SimpleGrantedAuthority(sysRoleEntity.getRoleName()));
+			   }*/
+		       // 封装成spring security的user
+		       User userDetail = new User(users.getUserName(), users.getUserPwd(),
 		                true,//是否可用
 		                true,//是否过期
 		                true,//证书不过期为true
 		                true,//账户未锁定为true ,
 		                grantedAuths);
-		        return userDetail;
+		       return userDetail;
 		} catch (Exception e) {
-			e.printStackTrace();
-			LOGGER.error("登录权限效验出现异常.");
-			return null;
+			  e.printStackTrace();
+			  LOGGER.error("登录权限效验出现异常.");
+			  return null;
 		}
      
       
