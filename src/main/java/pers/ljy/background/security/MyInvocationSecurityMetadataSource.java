@@ -55,7 +55,7 @@ public class MyInvocationSecurityMetadataSource implements FilterInvocationSecur
     	            for (SysResourceMenusEntity resource : resources) {
     	                Collection<ConfigAttribute> configAttributes = new CopyOnWriteArrayList<ConfigAttribute>();
     	                //和类：MyUserDetailService 的       authSet.add(new SimpleGrantedAuthority(sysResourceMenusEntity.getAuthorizedSigns()))参数 一致
-    	                ConfigAttribute configAttribute = new SecurityConfig(resource.getAuthorizedSigns());
+    	                ConfigAttribute configAttribute = new SecurityConfig("ROLE_"+resource.getAuthorizedSigns());
     	                configAttributes.add(configAttribute);
     	                //资源模块对应的url 地址
     	                resourceMap.put(resource.getMenuUrl(), configAttributes);

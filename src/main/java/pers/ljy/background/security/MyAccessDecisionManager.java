@@ -7,10 +7,14 @@ import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDecisionManager;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.ConfigAttribute;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -34,6 +38,9 @@ import pers.ljy.background.share.exception.BusinessException;
 @Component
 public class MyAccessDecisionManager implements AccessDecisionManager {
 	private static final Logger LOGGER = LoggerFactory.getLogger(MyUserDetailService.class); 
+
+	@Autowired
+	private AuthenticationManager authenticationManager; 
 	
 	/**
 	 * decide()方法在url请求时才会调用，服务器启动时不会执行这个方法，前提是需要在<http>标签内设置  <custom-filter>标签
@@ -51,11 +58,16 @@ public class MyAccessDecisionManager implements AccessDecisionManager {
 		if (configAttributes == null) {
             return;
         }
-		
+		//mmp  这里为什么取不到登录人的权限呢  取出来的全是 ROLE_ANONYMOUS(匿名状态)
 		authentication = SecurityContextHolder.getContext().getAuthentication();
 		FilterInvocation filterInvocation = (FilterInvocation) object; 
 		HttpSession httpSession = filterInvocation.getHttpRequest().getSession();
 		authentication = (Authentication) httpSession.getAttribute("SPRING_SECURITY_CONTEXT");
+		//重新认证，切记要用明文密码  
+	    if(authentication == null){
+	      authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken("admin","123456"));
+          SecurityContextHolder.getContext().setAuthentication(authentication);  
+        } 
 		
         //所请求的资源拥有的权限(一个资源对多个权限)
         Iterator<ConfigAttribute> iterator = configAttributes.iterator();

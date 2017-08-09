@@ -122,7 +122,7 @@ public class MyUserDetailService implements UserDetailsService {
             Set<SysResourceMenusEntity> res = roleMenuVo.getResourceMenusList();
             for (SysResourceMenusEntity sysResourceMenusEntity : res) {
             	//用户可以访问的资源名称（或者说用户所拥有的权限标识）
-                authSet.add(new SimpleGrantedAuthority(sysResourceMenusEntity.getAuthorizedSigns()));
+                authSet.add(new SimpleGrantedAuthority("ROLE_"+sysResourceMenusEntity.getAuthorizedSigns()));
 			}
         }
         return authSet;
