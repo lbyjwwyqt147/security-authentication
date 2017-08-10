@@ -63,7 +63,7 @@ public class MyAccessDecisionManager implements AccessDecisionManager {
 		if (configAttributes == null) {
             return;
         }
-		//mmp  这里为什么取不到登录人的权限呢  取出来的全是  ROLE_ANONYMOUS(匿名状态)
+		//mmp  这里为什么取不到登录人的权限呢  取出来的全是   ROLE_ANONYMOUS(匿名状态)
         SecurityContext securityContext = SecurityContextHolder.getContext();
 		authentication = SecurityContextHolder.getContext().getAuthentication();
 		//FilterInvocation filterInvocation = (FilterInvocation) object; 
