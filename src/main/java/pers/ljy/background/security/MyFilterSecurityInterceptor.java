@@ -38,7 +38,7 @@ import org.springframework.stereotype.Component;
 public class MyFilterSecurityInterceptor extends AbstractSecurityInterceptor implements Filter {
 	@Autowired
     private FilterInvocationSecurityMetadataSource securityMetadataSource;
-	@Autowired
+/*	@Autowired
 	private MyAccessDecisionManager myAccessDecisionManager;
 	@Resource
     private AuthenticationConfiguration authenticationConfiguration;
@@ -51,13 +51,13 @@ public class MyFilterSecurityInterceptor extends AbstractSecurityInterceptor imp
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
+	}*/
 	
 
-   /* @Autowired  
+    @Autowired  
     public void setMyAccessDecisionManager(MyAccessDecisionManager myAccessDecisionManager){  
         super.setAccessDecisionManager(myAccessDecisionManager);  
-    } */
+    } 
 	
 	@Override
 	public SecurityMetadataSource obtainSecurityMetadataSource() {
