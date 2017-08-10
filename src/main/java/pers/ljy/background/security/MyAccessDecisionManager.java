@@ -17,6 +17,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.FilterInvocation;
 import org.springframework.stereotype.Component;
@@ -30,6 +31,9 @@ import pers.ljy.background.share.exception.BusinessException;
  * 公 司: 
  * 内容摘要: 
  * 其他说明:
+ *       接口AccessDecisionManager也是必须实现的。 decide方法里面写的就是授权策略了，，需要什么策略，可以自己写其中的策略逻辑。
+ *       通过就返回，不通过抛异常就行了，spring security会自动跳到权限不足页面（配置文件上配的）。 
+ *       
  * 完成日期:2017年05月15日 
  * 修改记录:
  * @version 1.0
@@ -43,10 +47,11 @@ public class MyAccessDecisionManager implements AccessDecisionManager {
 	private AuthenticationManager authenticationManager; 
 	
 	/**
-	 * decide()方法在url请求时才会调用，服务器启动时不会执行这个方法，前提是需要在<http>标签内设置  <custom-filter>标签
-     * 参数说明：
-     * 1、configAttributes 装载了请求的url允许的角色数组 。这里是从MyInvocationSecurityMetadataSource里的loadResourceDefine方法里的atts对象取出的角色数据赋予给了configAttributes对象
-     * 2、authentication 装载了从数据库读出来的角色 数据。这里是从MyUserDetailService里的loadUserByUsername方法里的grantedAuths对象的值传过来给 authentication 对象
+	 * decide()方法在url请求时才会调用，服务器启动时不会执行这个方法
+     *
+     * @param configAttributes 装载了请求的url允许的角色数组 。这里是从MyInvocationSecurityMetadataSource里的loadResourceDefine方法里的atts对象取出的角色数据赋予给了configAttributes对象
+     * @param object url
+     * @param authentication 装载了从数据库读出来的权限(角色) 数据。这里是从MyUserDetailService里的loadUserByUsername方法里的grantedAuths对象的值传过来给 authentication 对象,简单点就是从spring的全局缓存SecurityContextHolder中拿到的，里面是用户的权限信息
      *  
      * 
 	 */
@@ -59,16 +64,17 @@ public class MyAccessDecisionManager implements AccessDecisionManager {
             return;
         }
 		//mmp  这里为什么取不到登录人的权限呢  取出来的全是 ROLE_ANONYMOUS(匿名状态)
+        SecurityContext securityContext = SecurityContextHolder.getContext();
 		authentication = SecurityContextHolder.getContext().getAuthentication();
-		FilterInvocation filterInvocation = (FilterInvocation) object; 
-		HttpSession httpSession = filterInvocation.getHttpRequest().getSession();
-		authentication = (Authentication) httpSession.getAttribute("SPRING_SECURITY_CONTEXT");
+		//FilterInvocation filterInvocation = (FilterInvocation) object; 
+	//	HttpSession httpSession = filterInvocation.getHttpRequest().getSession();
+		//authentication = (Authentication) httpSession.getAttribute("SPRING_SECURITY_CONTEXT");
 		//重新认证，切记要用明文密码  
-	    if(authentication == null){
+	    /*if(authentication == null){
 	      authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken("admin","123456"));
           SecurityContextHolder.getContext().setAuthentication(authentication);  
         } 
-		
+		*/
         //所请求的资源拥有的权限(一个资源对多个权限)
         Iterator<ConfigAttribute> iterator = configAttributes.iterator();
         //遍历configAttributes看用户是否有访问资源的权限  
@@ -87,6 +93,7 @@ public class MyAccessDecisionManager implements AccessDecisionManager {
                 }
             }
         }
+        // 注意：执行这里，后台是会抛异常的，但是界面会跳转到所配的access-denied-page页面
         throw new AccessDeniedException("没有权限访问！");
 	}
 

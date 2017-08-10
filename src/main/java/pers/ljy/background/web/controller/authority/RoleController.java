@@ -3,6 +3,8 @@ package pers.ljy.background.web.controller.authority;
 import java.util.Date;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import javax.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -62,7 +64,6 @@ public class RoleController extends BasicController{
 		PageForm<SysRoleEntity> pageForm = new PageForm<SysRoleEntity>();
 		pageForm.setTotal(10);
 		pageForm.setRows(list);
-		
 		return this.buildListsData(pageForm);
 	}
 	
@@ -73,12 +74,12 @@ public class RoleController extends BasicController{
 	 * @return
 	 */
 	@GetMapping(value="/userRolers/y")
-	public String ylist(int userId){
+	public String ylist(int userId,HttpSession httpSession){
+		String msg = (String) httpSession.getAttribute("AccessDeniedException");
 		CopyOnWriteArrayList<SysRoleEntity> list = this.roleService.selectUserRoleByUserIdIn(userId);
 		PageForm<SysRoleEntity> pageForm = new PageForm<SysRoleEntity>();
 		pageForm.setTotal(10);
 		pageForm.setRows(list);
-		
 		return this.buildListsData(pageForm);
 	}
 	

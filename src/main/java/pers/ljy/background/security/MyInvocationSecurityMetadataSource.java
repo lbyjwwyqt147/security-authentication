@@ -28,6 +28,12 @@ import pers.ljy.background.service.authority.SysResourceMenusService;
  * 公 司: 
  * 内容摘要: 
  * 其他说明:
+ *       实现FilterInvocationSecurityMetadataSource接口也是必须的。 首先，这里从数据库中获取信息。 其中loadResourceDefine方法不是必须的，
+ *       这个只是加载所有的资源与权限的对应关系并缓存起来，避免每次获取权限都访问数据库（提高性能），然后getAttributes根据参数（被拦截url）返回权限集合。
+ *       这种缓存的实现其实有一个缺点，因为loadResourceDefine方法是放在构造器上调用的，而这个类的实例化只在web服务器启动时调用一次，那就是说loadResourceDefine方法只会调用一次，
+ *       如果资源和权限的对应关系在启动后发生了改变，那么缓存起来的权限数据就和实际授权数据不一致，那就会授权错误了。但如果资源和权限对应关系是不会改变的，这种方法性能会好很多。
+ *       要想解决 权限数据的一致性 可以直接在getAttributes方法里面调用数据库操作获取权限数据，通过被拦截url获取数据库中的所有权限，封装成Collection<ConfigAttribute>返回就行了。（灵活、简单）
+ * 
  * 完成日期:2016年11月16日 
  * 修改记录:
  * @version 1.0
@@ -42,7 +48,7 @@ public class MyInvocationSecurityMetadataSource implements FilterInvocationSecur
 	private SysResourceMenusService sysResourceMenusService;
 	
 	 /**
-     * 加载所有资源与权限的关系，初始化资源  web容器启动就会执行
+     * 初始化资源 ,加载所有url和权限（或角色）的对应关系，  web容器启动就会执行
      */
     @PostConstruct
     public void loadResourceDefine() {
@@ -75,8 +81,9 @@ public class MyInvocationSecurityMetadataSource implements FilterInvocationSecur
 	}
 
 	/**
+	 * 参数是要访问的url，返回这个url对于的所有权限（或角色）
 	 * 每次请求后台就会调用 得到请求所拥有的权限
-	 * 这个方法在url请求时才会调用，服务器启动时不会执行这个方法，前提是需要在<http>标签内设置  <custom-filter>标签
+	 * 这个方法在url请求时才会调用，服务器启动时不会执行这个方法 
      * getAttributes这个方法会根据你的请求路径去获取这个路径应该是有哪些权限才可以去访问。
 	 * 
 	 */
