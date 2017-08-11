@@ -1,6 +1,8 @@
 package pers.ljy.background.security;
 
 import java.io.IOException;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -9,6 +11,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
+import pers.ljy.background.share.result.ApiResultView;
+import pers.ljy.background.share.result.BaseApiResultView;
+import pers.ljy.background.share.utils.SecurityReturnJson;
 
 /***
  * 文件名称: MyAuthenticationEntryPoint.java
@@ -23,10 +28,10 @@ import org.springframework.stereotype.Component;
  * @author ljy
  */
 @Component
-public class MyAuthenticationEntryPoint extends LoginUrlAuthenticationEntryPoint {
+public class MyAuthenticationFailureEntryPoint extends LoginUrlAuthenticationEntryPoint {
 
 	
-	public MyAuthenticationEntryPoint(String loginFormUrl) {
+	public MyAuthenticationFailureEntryPoint(String loginFormUrl) {
 		super(loginFormUrl);
 	}
 
@@ -36,15 +41,13 @@ public class MyAuthenticationEntryPoint extends LoginUrlAuthenticationEntryPoint
     @Override  
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException)  
                 throws IOException, ServletException {  
-            //super.commence(request, response, authException);  
           
            //返回json形式的错误信息  
-           response.setCharacterEncoding("UTF-8");  
-           response.setContentType("application/json");  
-                   
-           response.getWriter().println("{\"ok\":0,\"msg\":\""+authException.getLocalizedMessage()+"\"}");  
-           response.getWriter().flush();   
-           response.getWriter().close();
+           
+           ConcurrentMap <String, String> map = new ConcurrentHashMap<>();
+           map.put("authException", authException.getLocalizedMessage());
+           ApiResultView view = new ApiResultView(BaseApiResultView.AUTHENTICATIONFALL, map);
+           SecurityReturnJson.writeJavaScript(response, view);
         }  
 
 }

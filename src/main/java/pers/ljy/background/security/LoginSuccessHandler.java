@@ -18,7 +18,9 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 
 import pers.ljy.background.model.SysUsersAccountEntity;
+import pers.ljy.background.share.result.ApiResultCode;
 import pers.ljy.background.share.result.ApiResultView;
+import pers.ljy.background.share.utils.SecurityReturnJson;
 
 /***
  * 文件名称: LoginSuccessHandler.java
@@ -46,37 +48,8 @@ public class LoginSuccessHandler extends SavedRequestAwareAuthenticationSuccessH
 
         LOGGER.info("IP :" + this.getIpAddress(request));
         
-        response.setContentType("application/json;charset=UTF-8");
-        
-       /* response.setCharacterEncoding("UTF-8");  
-        response.setContentType("application/json");  
-        response.getWriter().println("{\"status\":0,\"msg\":\"登录成功\"}");  
-        response.getWriter().flush();
-        response.getWriter().close();*/
-        
-        
-        PrintWriter writer = response.getWriter();
-        String returnStr = "{\"status\":0,\"msg\":\"登录成功\"}";  
-        System.out.println(this.getClass().toString()+":"+returnStr);  
-        writer.write(returnStr);  
-        writer.flush();  
-        writer.close(); 
-        
-       /* String returnStr = "0";  
-        
-        response.setContentType("application/json;charset=UTF-8");
-        response.setHeader("Cache-Control","no-store, max-age=0, no-cache, must-revalidate");
-        response.addHeader("Cache-Control", "post-check=0, pre-check=0");
-        response.setHeader("Pragma", "no-cache");
-
-        PrintWriter out = response.getWriter();
-        //out.write(JSON.toJSONString(returnStr, SerializerFeature.DisableCircularReferenceDetect));//必须加上第二个参数。忽略循环引用
-        out.write(returnStr);
-        out.flush();
-        out.close();*/
-    
-
-        
+        ApiResultView view = new ApiResultView(ApiResultCode.SUCCESS.getCode(), ApiResultCode.SUCCESS.getMsg(), null);
+        SecurityReturnJson.writeJavaScript(response, view);
         
 		super.onAuthenticationSuccess(request, response, authentication);
 	}
