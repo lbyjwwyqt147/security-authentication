@@ -76,6 +76,7 @@ public class MyUserDetailService implements UserDetailsService {
 			throw new BusinessException("你没有权限登录!");
 		}
 		try {
+			   //封装用户信息和角色信息 到 SecurityContextHolder全局缓存中
 			   Collection<GrantedAuthority> grantedAuths = obtionGrantedAuthorities(users,userRoleList);
 		       /*Set<GrantedAuthority> grantedAuthorities = new HashSet<GrantedAuthority>();
 		       List<Integer> roleIdsList = new ArrayList<>();
@@ -88,10 +89,6 @@ public class MyUserDetailService implements UserDetailsService {
 			   }*/
 		       // 封装成spring security的user
 		       User userDetail = new User(users.getUserName(), users.getUserPwd(),
-		                true,//是否可用
-		                true,//是否过期
-		                true,//证书不过期为true
-		                true,//账户未锁定为true ,
 		                grantedAuths);
 		       return userDetail;
 		} catch (Exception e) {
@@ -116,15 +113,21 @@ public class MyUserDetailService implements UserDetailsService {
         for (SysUserRoleEntity role : roles) {
         	roleIds.add(role.getRoleId());
         }
-        //根据角色ID获取角色拥有的菜单资源
-        CopyOnWriteArrayList<RoleMenuVo> roleMenuList = this.roleMenuService.selectRoleMenuByRoleIdIn(roleIds);
-        for (RoleMenuVo roleMenuVo : roleMenuList) {
-            Set<SysResourceMenusEntity> res = roleMenuVo.getResourceMenusList();
-            for (SysResourceMenusEntity sysResourceMenusEntity : res) {
-            	//用户可以访问的资源名称（或者说用户所拥有的权限标识）
-                authSet.add(new SimpleGrantedAuthority("ROLE_"+sysResourceMenusEntity.getAuthorizedSigns()));
-			}
+        if(!roleIds.isEmpty()){
+        	 //根据角色ID获取角色拥有的菜单资源
+            CopyOnWriteArrayList<RoleMenuVo> roleMenuList = this.roleMenuService.selectRoleMenuByRoleIdIn(roleIds);
+            for (RoleMenuVo roleMenuVo : roleMenuList) {
+                Set<SysResourceMenusEntity> res = roleMenuVo.getResourceMenusList();
+                for (SysResourceMenusEntity sysResourceMenusEntity : res) {
+                	//用户可以访问的资源名称（或者说用户所拥有的权限标识）
+                    authSet.add(new SimpleGrantedAuthority("ROLE_"+sysResourceMenusEntity.getAuthorizedSigns()));
+    			}
+            }
+        }else{
+        	//用户可以访问的资源名称（或者说用户所拥有的权限标识）
+            authSet.add(new SimpleGrantedAuthority("ROLE_app:roles:del"));
         }
+       
         return authSet;
     }
 	

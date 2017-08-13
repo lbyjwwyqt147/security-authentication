@@ -49,8 +49,9 @@ public class MyInvocationSecurityMetadataSource implements FilterInvocationSecur
 	
 	 /**
      * 初始化资源 ,加载所有url和权限（或角色）的对应关系，  web容器启动就会执行
+     * 如果启动@PostConstruct 注解   则web容器启动时就会执行,不启动 @PostConstruct注解  则用户成功登陆后执行一次
      */
-    @PostConstruct
+  //  @PostConstruct 
     public void loadResourceDefine() {
         LOGGER.info(" web容器启动时就会 开始加载资源与权限的对应关系!!!");
     	try {

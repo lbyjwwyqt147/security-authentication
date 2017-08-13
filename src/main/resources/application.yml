@@ -5,6 +5,11 @@
 spring:
   profiles:
     active: dev
+# thymeleaf
+  thymeleaf:
+    prefix: classpath:/templates/
+    cache: false
+    suffix: .html
     
   #mybatis 配置
 mybatis: 

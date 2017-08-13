@@ -43,6 +43,10 @@
       <version>1.2.2</version>
     </dependency>
     
+     <dependency>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-thymeleaf</artifactId>
+	 </dependency>
 		
      <!-- 项目中公共共享包开始 -->
      <dependency>
@@ -57,6 +61,9 @@
      	<artifactId>spring-boot-configuration-processor</artifactId>
      	<optional>true</optional>
      </dependency>
+     
+
+     
      <dependency>
      	<groupId>org.apache.hadoop</groupId>
      	<artifactId>hadoop-core</artifactId>

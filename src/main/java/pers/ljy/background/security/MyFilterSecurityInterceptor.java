@@ -2,8 +2,6 @@ package pers.ljy.background.security;
 
 import java.io.IOException;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -14,10 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.SecurityMetadataSource;
 import org.springframework.security.access.intercept.AbstractSecurityInterceptor;
 import org.springframework.security.access.intercept.InterceptorStatusToken;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.web.FilterInvocation;
 import org.springframework.security.web.access.intercept.FilterInvocationSecurityMetadataSource;
 import org.springframework.stereotype.Component;
+
 
 /***
  * 文件名称: MyFilterSecurityInterceptor.java
@@ -35,53 +33,34 @@ import org.springframework.stereotype.Component;
  * @author ljy
  */
 @Component
-public class MyFilterSecurityInterceptor extends AbstractSecurityInterceptor implements Filter {
-	@Autowired
+public class MyFilterSecurityInterceptor extends AbstractSecurityInterceptor implements Filter{
+
+    @Autowired
     private FilterInvocationSecurityMetadataSource securityMetadataSource;
-/*	@Autowired
-	private MyAccessDecisionManager myAccessDecisionManager;
-	@Resource
-    private AuthenticationConfiguration authenticationConfiguration;
-	
-	@PostConstruct
-	public void init(){
-		try {
-			super.setAccessDecisionManager(myAccessDecisionManager);
-			super.setAuthenticationManager(authenticationConfiguration.getAuthenticationManager());
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}*/
-	
 
-    @Autowired  
-    public void setMyAccessDecisionManager(MyAccessDecisionManager myAccessDecisionManager){  
-        super.setAccessDecisionManager(myAccessDecisionManager);  
-    } 
-	
-	@Override
-	public SecurityMetadataSource obtainSecurityMetadataSource() {
-		return this.securityMetadataSource;
-	}
+    @Autowired
+    public void setMyAccessDecisionManager(MyAccessDecisionManager myAccessDecisionManager) {
+        super.setAccessDecisionManager(myAccessDecisionManager);
+    }
 
-	@Override
-	public void destroy() {
-		
-	}
+    @Override
+    public void init(FilterConfig filterConfig) throws ServletException {
 
-	/**
+    }
+
+    /**
 	 * 登录后，每次访问资源都通过这个拦截器拦截  
 	 */
-	@Override
-	public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
-			throws IOException, ServletException {
-		 FilterInvocation fi = new FilterInvocation(servletRequest, servletResponse, filterChain);
-         this.invoke(fi);
-	}
+    @Override
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+
+        FilterInvocation fi = new FilterInvocation(request, response, chain);
+        invoke(fi);
+    }
 
 
-    private void invoke(FilterInvocation fi) throws IOException, ServletException {
-        //fi里面有一个被拦截的url
+    public void invoke(FilterInvocation fi) throws IOException, ServletException {
+    	//fi里面有一个被拦截的url
         //里面调用MyInvocationSecurityMetadataSource的getAttributes(Object object)这个方法获取fi对应的所有权限
         //再调用MyAccessDecisionManager的decide方法来校验用户的权限是否足够
         InterceptorStatusToken token = super.beforeInvocation(fi);
@@ -92,15 +71,20 @@ public class MyFilterSecurityInterceptor extends AbstractSecurityInterceptor imp
             super.afterInvocation(token, null);
         }
     }
-	  
-	@Override
-	public void init(FilterConfig arg0) throws ServletException {
-		
-	}
 
-	@Override
-	public Class<?> getSecureObjectClass() {
+    @Override
+    public void destroy() {
+
+    }
+
+    @Override
+    public Class<?> getSecureObjectClass() {
         return FilterInvocation.class;
-	}
+    }
 
+    @Override
+    public SecurityMetadataSource obtainSecurityMetadataSource() {
+        return this.securityMetadataSource;
+    }
 }
+

@@ -3,19 +3,14 @@ package pers.ljy.background.security;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.web.access.channel.ChannelProcessingFilter;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
-import org.springframework.web.cors.CorsUtils;
 
-import pers.ljy.background.filter.SimpleCORSFilter;
 
 /***
  * 配置类
@@ -38,8 +33,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
      private MyUserDetailService myUserDetailService;
 	 @Autowired
 	 private MyFilterSecurityInterceptor myFilterSecurityInterceptor;
-	 @Autowired
-	 private SimpleCORSFilter simpleCORSFilter;
+
 	 
 	 
      @Bean
@@ -47,33 +41,44 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder();
      }
      
-     /**
-      * 前端资源拦截 可以在这里配置
-      */
-     /*@Override
-     public void configure(WebSecurity web) throws Exception {
-    	 super.configure(web);
-        // web.ignoring().antMatchers("/security/api/v1/users/logins","/security/api/v1/users/signins","/security/api/v1/resourceMenus/*");
-     }*/
-
-
-    /* @Override  
-     public AuthenticationManager authenticationManagerBean() throws Exception {  
-        return super.authenticationManagerBean();  
-     } */ 
-	    
 
      @Override
      protected void configure(HttpSecurity http) throws Exception {
+    	 
+    	 /**
+    	  * 通过项目访问的配置
+    	  */
+    	 http.csrf().disable()
+    	   .authorizeRequests()
+           .antMatchers("/","index","/login","/hello","/css/**","/js/**","/security/api/v1/users/logins","/security/api/v1/users/signins","/security/api/v1/resourceMenus/*","/security/api/v1/userRolers/y")//允许访问
+           .permitAll()
+           .anyRequest().authenticated()
+           .and()
+	         .exceptionHandling().authenticationEntryPoint(myAuthenticationFailureHandler()) 
+           .and()
+           .formLogin()
+           .loginPage("/login")// 登陆
+           .defaultSuccessUrl("/hello") //登陆成功后跳转
+           .permitAll()
+           .and()
+           .logout()
+           .permitAll();
+    	   http.addFilterBefore(myFilterSecurityInterceptor, FilterSecurityInterceptor.class);
+    	 
+    	   
+    	   
+    	   /**
+    	    * 前后分离 跨越访问配置
+    	    */
     	// http.addFilterBefore(simpleCORSFilter, ChannelProcessingFilter.class); 跨域
+/*
     	 http.csrf().disable()
 		         .authorizeRequests()
 		         .antMatchers("/security/api/v1/users/logins","/security/api/v1/users/signins","/security/api/v1/resourceMenus/*","/security/api/v1/userRolers/y").permitAll()//访问：这些路径 无需登录认证权限
-		         .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()  //PreflightRequest不做拦截
 		         .anyRequest().authenticated() //其他所有资源都需要认证，登陆后访问
 		         //.antMatchers("/resources").hasAuthority("ADMIN") //登陆后之后拥有“ADMIN”权限才可以访问/hello方法，否则系统会出现“403”权限不足的提示
 		  .and()
-		         .exceptionHandling().authenticationEntryPoint(myAuthenticationFailureEntryPoint())    //无权限访问 使用myAuthenticationFailureEntryPoint()做业务处理。
+		         .exceptionHandling().authenticationEntryPoint(myAuthenticationFailureHandler())    //无权限访问 使用myAuthenticationFailureEntryPoint()做业务处理。
 		  .and()
 		         .formLogin()
 		         .loginProcessingUrl("/security/api/v1/users/logins")
@@ -94,8 +99,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		        // .and()
 		         //.rememberMe()//登录后记住用户，下次自动登录,数据库中必须存在名为persistent_logins的表
 		         //.tokenValiditySeconds(1209600);
-		 http.addFilterBefore(myFilterSecurityInterceptor, FilterSecurityInterceptor.class);
-         
+		// http.addFilterBefore(myFilterSecurityInterceptor, FilterSecurityInterceptor.class);
+*/         
 
     	 
     	 
@@ -136,35 +141,31 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
      }
 
-     @Autowired
+    @Autowired
      public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
         //指定密码加密所使用的加密器为 bCryptPasswordEncoder()
         //需要将密码加密后写入数据库
     	 auth.userDetailsService(myUserDetailService).passwordEncoder(bCryptPasswordEncoder()); 
-    	// auth.eraseCredentials(false);
-    	// auth.userDetailsService(myUserDetailService);
+    	 auth.eraseCredentials(false);
      }
 
-     
-     /*@Override  
-     protected void configure(AuthenticationManagerBuilder auth) throws Exception {  
-    	 auth.userDetailsService(myUserDetailService);
-         //暂时使用基于内存的AuthenticationProvider  
-         auth.inMemoryAuthentication().withUser("userName").password("userPwd").roles("USER");  
-     }  */
-     
-     @Bean
-     public BCryptPasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(4);
-     }
 
      /**
       * 注册登录成功的bean
       * @return
       */
      @Bean
-     public LoginSuccessHandler loginSuccessHandler() {
-        return new LoginSuccessHandler();
+     public MyLoginSuccessHandler loginSuccessHandler() {
+        return new MyLoginSuccessHandler();
+     }
+	
+     /**
+      * 注册登录失败的bean
+      * @return
+      */
+     @Bean
+     public MyLoginFailureHandler loginFailureHandler() {
+        return new MyLoginFailureHandler();
      }
 	
      
@@ -173,7 +174,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
       * @return
       */
      @Bean
-     public MyAuthenticationFailureEntryPoint myAuthenticationFailureEntryPoint() {
-        return new MyAuthenticationFailureEntryPoint("/");
+     public MyAuthenticationFailureHandler myAuthenticationFailureHandler() {
+        return new MyAuthenticationFailureHandler("/");
      }
 }

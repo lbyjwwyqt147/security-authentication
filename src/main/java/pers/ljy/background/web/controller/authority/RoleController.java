@@ -75,7 +75,6 @@ public class RoleController extends BasicController{
 	 */
 	@GetMapping(value="/userRolers/y")
 	public String ylist(int userId,HttpSession httpSession){
-		String msg = (String) httpSession.getAttribute("AccessDeniedException");
 		CopyOnWriteArrayList<SysRoleEntity> list = this.roleService.selectUserRoleByUserIdIn(userId);
 		PageForm<SysRoleEntity> pageForm = new PageForm<SysRoleEntity>();
 		pageForm.setTotal(10);
