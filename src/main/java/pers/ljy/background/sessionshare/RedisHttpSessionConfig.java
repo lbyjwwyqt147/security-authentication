@@ -12,6 +12,9 @@ import org.springframework.session.data.redis.config.annotation.web.http.EnableR
  * 公 司: 
  * 内容摘要: 
  * 其他说明: session 和redis 关联
+ * 
+ *        1：EnableRedisHttpSession创建了一个名为springSessionRepositoryFilter的Spring Bean来实现过滤器。这个由Spring Session实现的过滤器是负责替换HttpSession的实现。在这种情况下，Spring Session由redis支持。
+ *        2：然后创建了一个RedisConnectionFactory来连接Spring Session到地址是localhost，端口为6379的redis服务器。更多关于配置Spring Data Redis的信息可以参考这个文档。
  *       
  * 完成日期:2017年08月15日 
  * 修改记录:
