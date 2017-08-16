@@ -46,9 +46,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
      protected void configure(HttpSecurity http) throws Exception {
     	 
     	 /**
-    	  * 通过项目访问的配置
+    	  * 通过项目访问的配置(同域)
     	  */
-    	 http.csrf().disable()
+/*    	 http.csrf().disable()
     	   .authorizeRequests()
            .antMatchers("/","index","/login","/hello","/css/**","/js/**","/security/api/v1/users/logins","/security/api/v1/users/signins","/security/api/v1/resourceMenus/*","/security/api/v1/userRolers/y")//允许访问
            .permitAll()
@@ -63,7 +63,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
            .and()
            .logout()
            .permitAll();
-    	   http.addFilterBefore(myFilterSecurityInterceptor, FilterSecurityInterceptor.class);
+    	   http.addFilterBefore(myFilterSecurityInterceptor, FilterSecurityInterceptor.class);*/
     	 
     	   
     	   
@@ -71,10 +71,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     	    * 前后分离 跨越访问配置
     	    */
     	// http.addFilterBefore(simpleCORSFilter, ChannelProcessingFilter.class); 跨域
-/*
+
     	 http.csrf().disable()
 		         .authorizeRequests()
-		         .antMatchers("/security/api/v1/users/logins","/security/api/v1/users/signins","/security/api/v1/resourceMenus/*","/security/api/v1/userRolers/y").permitAll()//访问：这些路径 无需登录认证权限
+		         .antMatchers("/security/api/v1/users/logins","/security/api/v1/users/signins","/security/api/v1/resourceMenus/*").permitAll()//访问：这些路径 无需登录认证权限
 		         .anyRequest().authenticated() //其他所有资源都需要认证，登陆后访问
 		         //.antMatchers("/resources").hasAuthority("ADMIN") //登陆后之后拥有“ADMIN”权限才可以访问/hello方法，否则系统会出现“403”权限不足的提示
 		  .and()
@@ -91,7 +91,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		         .successHandler(loginSuccessHandler()) //登录成功后可使用loginSuccessHandler()做业务处理，可选。
 		  .and()
 		         .logout()
-		         .logoutUrl("/admin/logout")
+		         .logoutUrl("/")
 		         .logoutSuccessUrl("/") //退出登录后的默认网址是”/home”
 		         
 		         .permitAll()
@@ -99,8 +99,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		        // .and()
 		         //.rememberMe()//登录后记住用户，下次自动登录,数据库中必须存在名为persistent_logins的表
 		         //.tokenValiditySeconds(1209600);
-		// http.addFilterBefore(myFilterSecurityInterceptor, FilterSecurityInterceptor.class);
-*/         
+		 http.addFilterBefore(myFilterSecurityInterceptor, FilterSecurityInterceptor.class);
+        
 
     	 
     	 

@@ -22,13 +22,12 @@ public class SimpleCORSFilter implements Filter {
 
 	 public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
 	        HttpServletResponse response = (HttpServletResponse) servletResponse;
-	       // String origin = (String) servletRequest.getRemoteHost()+":"+servletRequest.getRemotePort();
 	        /* 设置浏览器跨域访问 */
-	        response.setHeader("Access-Control-Allow-Origin", "*");
-	        response.setHeader("Access-Control-Allow-Methods", "POST,GET,OPTIONS,DELETE,PUT");
+	        response.setHeader("Access-Control-Allow-Origin", "*");//支持全域名访问，不安全，部署后需要固定限制为客户端网址
+	        response.setHeader("Access-Control-Allow-Methods", "POST,GET,OPTIONS,DELETE,PUT");//支持的http 动作
 	        response.setHeader("Access-Control-Max-Age", "3600");
-	        response.setHeader("Access-Control-Allow-Headers", "x-requested-with,Authorization");
-	        response.setHeader("Access-Control-Allow-Credentials","true");
+	        response.setHeader("Access-Control-Allow-Headers", "x-requested-with,Authorization,x-auth-token");//相应头
+	        response.setHeader("Access-Control-Allow-Credentials","true"); //跨域cookie设置
 	        filterChain.doFilter(servletRequest, servletResponse);
 	 }
 

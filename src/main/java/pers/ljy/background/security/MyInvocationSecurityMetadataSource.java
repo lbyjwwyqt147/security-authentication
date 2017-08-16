@@ -1,12 +1,15 @@
 package pers.ljy.background.security;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.annotation.PostConstruct;
+import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +17,7 @@ import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.access.SecurityConfig;
 import org.springframework.security.web.FilterInvocation;
 import org.springframework.security.web.access.intercept.FilterInvocationSecurityMetadataSource;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.stereotype.Component;
 
 import pers.ljy.background.model.SysResourceMenusEntity;
@@ -49,7 +53,7 @@ public class MyInvocationSecurityMetadataSource implements FilterInvocationSecur
 	
 	 /**
      * 初始化资源 ,加载所有url和权限（或角色）的对应关系，  web容器启动就会执行
-     * 如果启动@PostConstruct 注解   则web容器启动时就会执行,不启动 @PostConstruct注解  则用户成功登陆后执行一次
+     * 如果启动@PostConstruct 注解   则web容器启动时就会执行
      */
   //  @PostConstruct 
     public void loadResourceDefine() {
@@ -90,14 +94,29 @@ public class MyInvocationSecurityMetadataSource implements FilterInvocationSecur
 	 */
 	@Override
 	public Collection<ConfigAttribute> getAttributes(Object object) throws IllegalArgumentException {
-		if (resourceMap == null)loadResourceDefine();
+		if (resourceMap == null){
+			loadResourceDefine();
+		}
 		FilterInvocation filterInvocation = (FilterInvocation) object; 
-		// 获取用户请求的url地址
-        String requestUrl = filterInvocation.getRequestUrl();
-        // 返回当前 url  所需要的权限
-        return resourceMap.get(requestUrl);
+	    HttpServletRequest request = filterInvocation.getHttpRequest();
+        AntPathRequestMatcher urlMatcher;
+        String requestUrl;
+       //循环已有的角色配置对象 进行url匹配
+        Iterator<String> ite = resourceMap.keySet().iterator();
+        while (ite.hasNext()) {
+        	requestUrl = ite.next();
+        	if(StringUtils.isNotBlank(requestUrl)){
+        		urlMatcher = new AntPathRequestMatcher(requestUrl);
+                if (urlMatcher.matches(request)) {
+                    //返回当前 url  所需要的权限
+                    return resourceMap.get(requestUrl); 
+                }
+        	}
+        }
+        return null;
 	}
 
+	//必须实现的方法 并且返回true
 	@Override
 	public boolean supports(Class<?> arg0) {
 		return true;

@@ -1,6 +1,7 @@
 #端口
 server:
   port: 18080
+  session-timeout: 60 
   
 #数据源配置
 druid:

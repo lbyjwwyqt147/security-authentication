@@ -5,6 +5,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -49,16 +50,27 @@ public class MyLoginSuccessHandler extends SavedRequestAwareAuthenticationSucces
         SecurityContext securityContext = SecurityContextHolder.getContext();
         securityContext.setAuthentication(authentication);
 		
+        request.getSession().setAttribute("SPRING_SECURITY_CONTEXT", securityContext);
+        request.getSession().setAttribute("SESSION_OPERATOR", userDetails);
+        
         //输出登录提示信息
         LOGGER.info("用户：" + userDetails.getUsername()+ " 成功登录系统.");
 
         LOGGER.info("请求 IP :" + ((WebAuthenticationDetails) authentication
                 .getDetails()).getRemoteAddress());
         
+        String sessionId = request.getSession().getId();
+        
+        LOGGER.info("sessionId :" + request.getSession().getId());
+        
         ConcurrentMap <String, String> map = new ConcurrentHashMap<>();
         // 登陆成功后返回一个加密token  以后通过token进行权限验证
-        map.put("token","123" );
-        
+        map.put("token",sessionId);
+        map.put("SESSION", sessionId);
+        Cookie sessionCookie = new Cookie("SESSION",sessionId);
+        Cookie tokenCookie = new Cookie("token",sessionId);
+        response.addCookie(sessionCookie);
+        response.addCookie(tokenCookie);
         ApiResultView view = new ApiResultView(ApiResultCode.SUCCESS.getCode(), ApiResultCode.SUCCESS.getMsg(), map);
         SecurityReturnJson.writeJavaScript(response, view);
         

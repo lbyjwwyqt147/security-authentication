@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
  * @version 1.0
  * @author ljy
  */
-@Component
+//@Component
 public class Initializer extends AbstractHttpSessionApplicationInitializer {
 
 }

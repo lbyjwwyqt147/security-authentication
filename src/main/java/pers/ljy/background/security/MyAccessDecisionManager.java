@@ -3,8 +3,13 @@ package pers.ljy.background.security;
 import java.util.Collection;
 import java.util.Iterator;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDecisionManager;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.ConfigAttribute;
@@ -12,8 +17,12 @@ import org.springframework.security.authentication.InsufficientAuthenticationExc
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.web.FilterInvocation;
+import org.springframework.session.web.http.HttpSessionStrategy;
 import org.springframework.stereotype.Component;
+
+import pers.ljy.background.share.redis.RedisService;
 
 
 /***
@@ -35,6 +44,10 @@ import org.springframework.stereotype.Component;
 public class MyAccessDecisionManager implements AccessDecisionManager {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(MyAccessDecisionManager.class);
+    @Autowired
+    private HttpSessionStrategy httpSession;
+    @Autowired
+    private RedisService redisService;
 
     /**
      * 判断是否拥有权限
@@ -54,6 +67,28 @@ public class MyAccessDecisionManager implements AccessDecisionManager {
         if(null== configAttributes || configAttributes.size() <=0) {
             return;
         }
+        
+       
+        
+        FilterInvocation fi = (FilterInvocation) object; 
+
+        String sidString = fi.getHttpRequest().getParameter("SESSION");
+        
+        System.out.println(fi.getHttpRequest().getHeader("x-auth-token"));
+
+       System.out.println(fi.getHttpResponse().getHeaders("x-auth-token"));
+        
+        String sessionId = httpSession.getRequestedSessionId(fi.getRequest());
+        LOGGER.info("sessionId：" +sessionId);
+        
+        HttpSession session = (HttpSession) redisService.get("spring:session:sessions:"+sessionId);
+        
+        SecurityContext securityContext = (SecurityContext) session.getAttribute("SPRING_SECURITY_CONTEXT");
+        authentication = securityContext.getAuthentication();
+        
+        
+        
+        
         String needRole;
         //遍历configAttributes看用户是否有访问资源的权限  
         for(Iterator<ConfigAttribute> iter = configAttributes.iterator(); iter.hasNext(); ) {
@@ -72,6 +107,8 @@ public class MyAccessDecisionManager implements AccessDecisionManager {
         throw new AccessDeniedException("没有权限访问！");
     }
 
+  
+    
     @Override
     public boolean supports(ConfigAttribute attribute) {
         return true;

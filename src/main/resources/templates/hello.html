@@ -13,21 +13,27 @@
 </form>
 
 
-<a href="" onclick="data()"> 点击测试权限
+<a href="" onclick="data()"> 点击测试权限 </a>
+<br/>
+<br/>
+<br/>
+<a href="" onclick="dataNo()"> 点击测试权限 </a>
 
-</a>
+<script th:inline="javascript">  
 
-<script type="text/javascript">
  function data(){
  
    $.ajax({
-            url: "http://127.0.0.1:18080/security/api/v1//roles",
+            url: "/ajax",
             type:"GET",
             dataType:"json",
+            cache: false,  
+            async: true,  
+       
             success :function (data,textStatus) {
                 console.log(data);
                 if(data.status == 0){
-                   alert("成功");
+                   alert("获取数据成功.");
                 }else{
                     alert(data.msg);
                 }
@@ -39,6 +45,30 @@
         });
  }
   
+  
+  function dataNo(){
+ 
+   $.ajax({
+            url: "/ajax1",
+            type:"GET",
+            dataType:"json",
+            cache: false,  
+            async: true,  
+            timeout : 3000,
+            success :function (data,textStatus) {
+                console.log(data);
+                if(data.status == 0){
+                   alert("获取数据成功.");
+                }else{
+                    alert(data.msg);
+                }
+
+            },
+            error:function (jqXHR , textStatus, errorThrown) {
+               alert('网络错误!');
+            }
+        });
+ } 
 
 </script>
 

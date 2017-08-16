@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
  * @version 1.0
  * @author ljy
  */
-@Component
+//@Component
 public class SecurityInitializer extends AbstractSecurityWebApplicationInitializer {
 
 	public SecurityInitializer() {

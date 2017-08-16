@@ -1,20 +1,27 @@
 package pers.ljy.background.datasource;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.annotation.Resource;
 import javax.sql.DataSource;
 
+import org.apache.ibatis.mapping.DatabaseIdProvider;
+import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.aspectj.apache.bcel.util.ClassLoaderRepository;
 import org.mybatis.spring.annotation.MapperScan;
+import org.mybatis.spring.boot.autoconfigure.ConfigurationCustomizer;
 import org.mybatis.spring.boot.autoconfigure.MybatisAutoConfiguration;
+import org.mybatis.spring.boot.autoconfigure.MybatisProperties;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
 
 /***
@@ -33,7 +40,22 @@ import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
 @MapperScan(basePackages={"pers.ljy.background.mapper"}) 
 public class MybatisConfiguration extends MybatisAutoConfiguration {
       
-	  /** 从库数量(有多少个从库)*/
+	/**
+	 * 默认的构造函数
+	 * @param properties
+	 * @param interceptorsProvider
+	 * @param resourceLoader
+	 * @param databaseIdProvider
+	 * @param configurationCustomizersProvider
+	 */
+	public MybatisConfiguration(MybatisProperties properties, ObjectProvider<Interceptor[]> interceptorsProvider,
+			ResourceLoader resourceLoader, ObjectProvider<DatabaseIdProvider> databaseIdProvider,
+			ObjectProvider<List<ConfigurationCustomizer>> configurationCustomizersProvider) {
+		super(properties, interceptorsProvider, resourceLoader, databaseIdProvider, configurationCustomizersProvider);
+		
+	}
+
+	/** 从库数量(有多少个从库)*/
 	  @Value("${druid.slaveSize}")
 	  private String slaveSize;
 	
