@@ -1,5 +1,7 @@
 package pers.ljy.background.security;
 
+import javax.annotation.Resource;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -8,8 +10,10 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
+import org.springframework.security.web.authentication.session.ConcurrentSessionControlAuthenticationStrategy;
 
 
 /***
@@ -33,7 +37,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
      private MyUserDetailService myUserDetailService;
 	 @Autowired
 	 private MyFilterSecurityInterceptor myFilterSecurityInterceptor;
-
+	 @Resource
+	 private SessionRegistry sessionRegistry;
 	 
 	 
      @Bean
@@ -91,16 +96,19 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		         .successHandler(loginSuccessHandler()) //登录成功后可使用loginSuccessHandler()做业务处理，可选。
 		  .and()
 		         .logout()
-		         .logoutUrl("/")
+		         .logoutUrl("/logout")
 		         .logoutSuccessUrl("/") //退出登录后的默认网址是”/home”
 		         
 		         .permitAll()
-		         .invalidateHttpSession(true);
-		        // .and()
-		         //.rememberMe()//登录后记住用户，下次自动登录,数据库中必须存在名为persistent_logins的表
-		         //.tokenValiditySeconds(1209600);
-		 http.addFilterBefore(myFilterSecurityInterceptor, FilterSecurityInterceptor.class);
-        
+		         .invalidateHttpSession(true)
+		         .and()
+		         .rememberMe()//登录后记住用户，下次自动登录,数据库中必须存在名为persistent_logins的表
+		         .tokenValiditySeconds(1209600);
+		  http.addFilterBefore(myFilterSecurityInterceptor, FilterSecurityInterceptor.class);
+		  //session 失效跳转 参数为要跳转到的页面url
+	      http.sessionManagement().invalidSessionStrategy(invalidSessionStrategy);
+	      //只允许一个用户登录,如果同一个帐号两次登录，那么第一个账户将被提下线，跳转到登录页面
+	      http.sessionManagement().sessionAuthenticationStrategy(mySessionAuthenticationFailureHandler());
 
     	 
     	 
@@ -141,7 +149,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
      }
 
-    @Autowired
+     @Autowired
      public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
         //指定密码加密所使用的加密器为 bCryptPasswordEncoder()
         //需要将密码加密后写入数据库
@@ -177,4 +185,17 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
      public MyAuthenticationFailureHandler myAuthenticationFailureHandler() {
         return new MyAuthenticationFailureHandler("/");
      }
+     
+     /**
+      * 注册权限认证失败的bean
+      * @return
+      */
+     @Bean
+     public ConcurrentSessionControlAuthenticationStrategy mySessionAuthenticationFailureHandler() {
+    	 ConcurrentSessionControlAuthenticationStrategy concurrentSession = new MySessionAuthenticationFailureHandler(sessionRegistry);
+    	 concurrentSession.setExceptionIfMaximumExceeded(true);
+    	 return concurrentSession;
+     }
+     
+     
 }

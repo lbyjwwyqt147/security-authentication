@@ -75,7 +75,7 @@ public class MyFilterSecurityInterceptor extends AbstractSecurityInterceptor imp
     public void invoke(FilterInvocation fi) throws IOException, ServletException {
     	
     	 //获取session
-         if(httpSession.getHttpSession(fi.getHttpRequest(), fi.getHttpResponse()) != null){
+        // if(httpSession.getHttpSession(fi.getHttpRequest(), fi.getHttpResponse()) != null){
 
         	//fi里面有一个被拦截的url
             //里面调用MyInvocationSecurityMetadataSource的getAttributes(Object object)这个方法获取fi对应的所有权限
@@ -87,10 +87,10 @@ public class MyFilterSecurityInterceptor extends AbstractSecurityInterceptor imp
             } finally {
                 super.afterInvocation(token, null);
             }
-         }else {
+        /* }else {
         	 ApiResultView view = new ApiResultView(ApiResultCode.FAIL.getCode(), "登录超时.", null);
              SecurityReturnJson.writeJavaScript(fi.getHttpResponse(), view);
-		}
+		}*/
          
     }
     

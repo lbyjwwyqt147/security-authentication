@@ -5,6 +5,11 @@
 spring:
   profiles:
     active: dev
+
+# session    
+  session:  
+      store-type: none  
+      
 # thymeleaf
   thymeleaf:
     prefix: classpath:/templates/
