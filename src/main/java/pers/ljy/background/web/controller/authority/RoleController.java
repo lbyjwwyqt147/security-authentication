@@ -59,12 +59,12 @@ public class RoleController extends BasicController{
 	 * @return
 	 */
 	@GetMapping(value="/roles")
-	public String list(RoleVo from){
+	public ApiResultView list(RoleVo from){
 		CopyOnWriteArrayList<SysRoleEntity> list = this.roleService.selectAll();
 		PageForm<SysRoleEntity> pageForm = new PageForm<SysRoleEntity>();
 		pageForm.setTotal(10);
 		pageForm.setRows(list);
-		return this.buildListsData(pageForm);
+		return this.buildDataPacket(pageForm);
 	}
 	
 	
@@ -74,12 +74,12 @@ public class RoleController extends BasicController{
 	 * @return
 	 */
 	@GetMapping(value="/userRolers/y")
-	public String ylist(int userId,HttpSession httpSession){
+	public ApiResultView ylist(int userId,HttpSession httpSession){
 		CopyOnWriteArrayList<SysRoleEntity> list = this.roleService.selectUserRoleByUserIdIn(userId);
 		PageForm<SysRoleEntity> pageForm = new PageForm<SysRoleEntity>();
 		pageForm.setTotal(10);
 		pageForm.setRows(list);
-		return this.buildListsData(pageForm);
+		return this.buildDataPacket(pageForm);
 	}
 	
 	/**
@@ -87,13 +87,13 @@ public class RoleController extends BasicController{
 	 * @return
 	 */
 	@GetMapping(value="/userRolers/n")
-	public String list(int userId){
+	public ApiResultView list(int userId){
 		CopyOnWriteArrayList<SysRoleEntity> list = this.roleService.selectUserRoleByUserIdNotIn(userId);
 		PageForm<SysRoleEntity> pageForm = new PageForm<SysRoleEntity>();
 		pageForm.setTotal(10);
 		pageForm.setRows(list);
 		
-		return this.buildListsData(pageForm);
+		return this.buildDataPacket(pageForm);
 	}
 
 }

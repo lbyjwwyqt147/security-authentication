@@ -76,7 +76,9 @@ public class ResourceMenusController extends BasicController {
 	@GetMapping(value="/resourceMenus/tree1")
 	public ApiResultView tree1(@RequestParam(value="pid",required=true) String pid){
 		JsTree tree = this.resourceMenusService.menusTree(pid);
-		return this.buildDataPacket(tree);
+		List<JsTree> list = new ArrayList<>();
+		list.add(tree);
+		return this.buildDataPacket(list);
 
 	}
 	
@@ -97,11 +99,11 @@ public class ResourceMenusController extends BasicController {
 	 * @return
 	 */
 	@GetMapping(value="/resourceMenus/y")
-	public String treey(@RequestParam(value="roleId",required=true)Integer roleId){
+	public ApiResultView treey(@RequestParam(value="roleId",required=true)Integer roleId){
 		JsTree tree = this.resourceMenusService.roleMenusIn(roleId);
 		List<JsTree> list = new ArrayList<>();
 		list.add(tree);
-		return this.buildListsData(list);
+		return this.buildDataPacket(list);
 	}
 	
 	/**
@@ -110,11 +112,11 @@ public class ResourceMenusController extends BasicController {
 	 * @return
 	 */
 	@GetMapping(value="/resourceMenus/n")
-	public String treen(@RequestParam(value="roleId",required=true)Integer roleId){
+	public ApiResultView treen(@RequestParam(value="roleId",required=true)Integer roleId){
 		JsTree tree = this.resourceMenusService.roleMenusNotIn(roleId);
 		List<JsTree> list = new ArrayList<>();
 		list.add(tree);
-		return this.buildListsData(list);
+		return this.buildDataPacket(list);
 	}
 	
 	/**
@@ -123,7 +125,11 @@ public class ResourceMenusController extends BasicController {
 	 * @return
 	 */
 	@GetMapping(value="/resourceMenus/user")
-	public String userMenus(){
-		return this.buildListsData(this.resourceMenusService.userMenus("", ""));
+	public ApiResultView userMenus(){
+		return this.buildDataPacket(this.resourceMenusService.userMenus("", ""));
 	}
+	
+	
+	
+
 }

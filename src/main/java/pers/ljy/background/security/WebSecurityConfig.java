@@ -12,6 +12,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.security.web.authentication.session.ConcurrentSessionControlAuthenticationStrategy;
 
@@ -37,8 +38,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
      private MyUserDetailService myUserDetailService;
 	 @Autowired
 	 private MyFilterSecurityInterceptor myFilterSecurityInterceptor;
-	 @Resource
-	 private SessionRegistry sessionRegistry;
+	// @Resource
+	// private SessionRegistry sessionRegistry;
 	 
 	 
      @Bean
@@ -82,8 +83,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		         .antMatchers("/security/api/v1/users/logins","/security/api/v1/users/signins","/security/api/v1/resourceMenus/*").permitAll()//访问：这些路径 无需登录认证权限
 		         .anyRequest().authenticated() //其他所有资源都需要认证，登陆后访问
 		         //.antMatchers("/resources").hasAuthority("ADMIN") //登陆后之后拥有“ADMIN”权限才可以访问/hello方法，否则系统会出现“403”权限不足的提示
-		  .and()
-		         .exceptionHandling().authenticationEntryPoint(myAuthenticationFailureHandler())    //无权限访问 使用myAuthenticationFailureEntryPoint()做业务处理。
+		         .and().exceptionHandling().accessDeniedHandler(myAccessDeniedHandler()) //无权限,权限不足访问 使用myAccessDeniedHandler()做业务处理。
+		         .and()
+		         .exceptionHandling().authenticationEntryPoint(myLoginAuthenticationFailureHandler())    //未登录状态(没有登录)下 使用myLoginAuthenticationFailureHandler()做业务处理。
+		         
 		  .and()
 		         .formLogin()
 		         .loginProcessingUrl("/security/api/v1/users/logins")
@@ -94,6 +97,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		         .loginPage("/")//指定登录页是”/”
 		         .permitAll()
 		         .successHandler(loginSuccessHandler()) //登录成功后可使用loginSuccessHandler()做业务处理，可选。
+		         .failureHandler(loginFailureHandler()) //登录失败 业务处理
 		  .and()
 		         .logout()
 		         .logoutUrl("/logout")
@@ -106,9 +110,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		         .tokenValiditySeconds(1209600);
 		  http.addFilterBefore(myFilterSecurityInterceptor, FilterSecurityInterceptor.class);
 		  //session 失效跳转 参数为要跳转到的页面url
-	      http.sessionManagement().invalidSessionStrategy(invalidSessionStrategy);
+	    //  http.sessionManagement().invalidSessionStrategy(invalidSessionStrategy);
 	      //只允许一个用户登录,如果同一个帐号两次登录，那么第一个账户将被提下线，跳转到登录页面
-	      http.sessionManagement().sessionAuthenticationStrategy(mySessionAuthenticationFailureHandler());
+	    //  http.sessionManagement().sessionAuthenticationStrategy(mySessionAuthenticationFailureHandler());
 
     	 
     	 
@@ -178,24 +182,36 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	
      
      /**
-      * 注册权限认证失败的bean
+      * 注册未登录的bean
       * @return
       */
      @Bean
-     public MyAuthenticationFailureHandler myAuthenticationFailureHandler() {
-        return new MyAuthenticationFailureHandler("/");
+     public MyLoginAuthenticationFailureHandler myLoginAuthenticationFailureHandler() {
+        return new MyLoginAuthenticationFailureHandler("/");
      }
      
      /**
-      * 注册权限认证失败的bean
+      * 注册session认证失败的bean
       * @return
       */
      @Bean
      public ConcurrentSessionControlAuthenticationStrategy mySessionAuthenticationFailureHandler() {
-    	 ConcurrentSessionControlAuthenticationStrategy concurrentSession = new MySessionAuthenticationFailureHandler(sessionRegistry);
+    	 /*ConcurrentSessionControlAuthenticationStrategy concurrentSession = new MySessionAuthenticationFailureHandler(sessionRegistry);
     	 concurrentSession.setExceptionIfMaximumExceeded(true);
-    	 return concurrentSession;
+    	 return concurrentSession;*/
+    	 return null;
      }
+     
+     /**
+      * 注册认证权限不足的bean
+      * @return
+      */
+     @Bean
+     public AccessDeniedHandler myAccessDeniedHandler(){
+    	 return new MyAccessDeniedHandler();
+     }
+     
+     
      
      
 }

@@ -37,7 +37,7 @@ public class MyLoginFailureHandler extends SimpleUrlAuthenticationFailureHandler
 		LOGGER.info("登陆失败.");
 	    ConcurrentMap <String, String> map = new ConcurrentHashMap<>();
         map.put("exception", exception.getLocalizedMessage());
-        ApiResultView view = new ApiResultView(ApiResultCode.FAIL.getCode(), ApiResultCode.FAIL.getMsg(), map);
+        ApiResultView view = new ApiResultView(ApiResultCode.FAIL.getCode(),"未知的用户名或者密码", map);
         SecurityReturnJson.writeJavaScript(response, view);
 
 	  // super.onAuthenticationFailure(request, response, exception);  

@@ -13,13 +13,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
+
+import pers.ljy.background.share.result.ApiResultCode;
 import pers.ljy.background.share.result.ApiResultView;
-import pers.ljy.background.share.result.BaseApiResultView;
 import pers.ljy.background.share.utils.SecurityReturnJson;
 
 /***
- * 文件名称: MyAuthenticationFailureHandler.java
- * 文件描述: 没有资源访问权限需要做的业务操作
+ * 文件名称: MyLoginAuthenticationFailureHandler.java
+ * 文件描述: 未登录状态(没有登录)下访问资源时 需要做的业务操作
  * 
  * 公 司: 
  * 内容摘要: 
@@ -30,10 +31,10 @@ import pers.ljy.background.share.utils.SecurityReturnJson;
  * @author ljy
  */
 @Component
-public class MyAuthenticationFailureHandler extends LoginUrlAuthenticationEntryPoint {
-	private final static Logger LOGGER = LoggerFactory.getLogger(MyAuthenticationFailureHandler.class);
+public class MyLoginAuthenticationFailureHandler extends LoginUrlAuthenticationEntryPoint {
+	private final static Logger LOGGER = LoggerFactory.getLogger(MyLoginAuthenticationFailureHandler.class);
 	
-	public MyAuthenticationFailureHandler(String loginFormUrl) {
+	public MyLoginAuthenticationFailureHandler(String loginFormUrl) {
 		super(loginFormUrl);
 	}
 
@@ -44,11 +45,11 @@ public class MyAuthenticationFailureHandler extends LoginUrlAuthenticationEntryP
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException)  
                 throws IOException, ServletException {  
 	
-	    LOGGER.info("你无访问资源的权限.");
+	    LOGGER.info("处于未登录状态,请让用户登录.");
         //返回json形式的错误信息  
         ConcurrentMap <String, String> map = new ConcurrentHashMap<>();
         map.put("authException", authException.getLocalizedMessage());
-        ApiResultView view = new ApiResultView(BaseApiResultView.AUTHENTICATIONFALL, map);
+        ApiResultView view = new ApiResultView(ApiResultCode.ERROR.getCode(),"请重新登录进入系统.", map);
         SecurityReturnJson.writeJavaScript(response, view);
 
     }  

@@ -124,11 +124,11 @@ public class UserAccountController extends BasicController {
 	 */
 	@GetMapping(value="/users")
 	@SystemControllerLog(description="用户列表")
-	public String userLists(){
+	public ApiResultView userLists(){
 		CopyOnWriteArrayList<SysUsersAccountEntity> list = this.usersAccountService.selectAll();
 		PageForm<SysUsersAccountEntity> pageForm = new PageForm<SysUsersAccountEntity>();
 		pageForm.setTotal(10);
 		pageForm.setRows(list);
-		return this.buildListsData(pageForm);
+		return this.buildDataPacket(pageForm);
 	}
 }

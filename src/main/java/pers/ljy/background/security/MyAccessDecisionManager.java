@@ -68,7 +68,7 @@ public class MyAccessDecisionManager implements AccessDecisionManager {
             return;
         }
         
-       
+    /*   
         
         FilterInvocation fi = (FilterInvocation) object; 
 
@@ -86,7 +86,7 @@ public class MyAccessDecisionManager implements AccessDecisionManager {
         SecurityContext securityContext = (SecurityContext) session.getAttribute("SPRING_SECURITY_CONTEXT");
         authentication = securityContext.getAuthentication();
         
-        
+        */
         
         
         String needRole;
