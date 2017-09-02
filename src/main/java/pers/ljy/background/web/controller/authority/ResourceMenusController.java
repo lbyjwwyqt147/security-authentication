@@ -7,6 +7,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -124,9 +125,9 @@ public class ResourceMenusController extends BasicController {
 	 * @param roleId
 	 * @return
 	 */
-	@GetMapping(value="/resourceMenus/user")
-	public ApiResultView userMenus(){
-		return this.buildDataPacket(this.resourceMenusService.userMenus("", ""));
+	@GetMapping(value="/resourceMenus/user/{userId}/{token}")
+	public ApiResultView userMenus(@PathVariable("userId") String userId, @PathVariable("token") String token){
+		return this.buildDataPacket(this.resourceMenusService.userMenus(userId,token));
 	}
 	
 	

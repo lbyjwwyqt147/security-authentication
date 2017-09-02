@@ -211,6 +211,8 @@ public class SysResourceMenusServiceImpl extends BaseServiceImpl<SysResourceMenu
 	@Override
 	public CopyOnWriteArrayList<JsTree> userMenus(String userId, String token) {
 		CopyOnWriteArrayList<JsTree> userMenusList = new CopyOnWriteArrayList<>();
+		//根据token 获取当前登陆人的角色ID
+		
 		CopyOnWriteArrayList<SysResourceMenusEntity> list = this.selectByRoleIdIn(1,"1002");
 		if(list != null && !list.isEmpty()){
 			list.forEach(it -> {

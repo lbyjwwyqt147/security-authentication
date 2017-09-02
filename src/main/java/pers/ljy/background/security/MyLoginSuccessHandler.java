@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import javax.annotation.Resource;
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -14,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
@@ -36,6 +38,10 @@ import pers.ljy.background.share.utils.SecurityReturnJson;
  */
 public class MyLoginSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
 	private static final Logger LOGGER = LoggerFactory.getLogger(MyLoginSuccessHandler.class); 
+	
+	
+	@Resource
+    private SessionRegistry sessionRegistry;
 	
 	/**
 	 * 登陆成功后会调用这里
@@ -62,6 +68,9 @@ public class MyLoginSuccessHandler extends SavedRequestAwareAuthenticationSucces
         String sessionId = request.getSession().getId();
         
         LOGGER.info("sessionId :" + request.getSession().getId());
+        
+        //当用户登录验证成功后 注册session
+        sessionRegistry.registerNewSession(sessionId,authentication.getPrincipal());
         
         ConcurrentMap <String, String> map = new ConcurrentHashMap<>();
         // 登陆成功后返回一个加密token  以后通过token进行权限验证

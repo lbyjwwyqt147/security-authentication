@@ -1,6 +1,5 @@
 package pers.ljy.background.security;
 
-import javax.annotation.Resource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -11,10 +10,16 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.authentication.session.ConcurrentSessionControlAuthenticationStrategy;
+import org.springframework.security.web.session.ConcurrentSessionFilter;
+import org.springframework.security.web.session.HttpSessionEventPublisher;
+import org.springframework.security.web.session.SessionInformationExpiredStrategy;
+import org.springframework.security.web.session.SimpleRedirectSessionInformationExpiredStrategy;
 
 
 /***
@@ -80,7 +85,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     	 http.csrf().disable()
 		         .authorizeRequests()
-		         .antMatchers("/security/api/v1/users/logins","/security/api/v1/users/signins","/security/api/v1/resourceMenus/*").permitAll()//访问：这些路径 无需登录认证权限
+		         .antMatchers("/security/api/v1/logout","/security/api/v1/users/logins","/security/api/v1/users/signins","/security/api/v1/resourceMenus/*").permitAll()//访问：这些路径 无需登录认证权限
 		         .anyRequest().authenticated() //其他所有资源都需要认证，登陆后访问
 		         //.antMatchers("/resources").hasAuthority("ADMIN") //登陆后之后拥有“ADMIN”权限才可以访问/hello方法，否则系统会出现“403”权限不足的提示
 		         .and().exceptionHandling().accessDeniedHandler(myAccessDeniedHandler()) //无权限,权限不足访问 使用myAccessDeniedHandler()做业务处理。
@@ -100,15 +105,24 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		         .failureHandler(loginFailureHandler()) //登录失败 业务处理
 		  .and()
 		         .logout()
-		         .logoutUrl("/logout")
+		         .logoutUrl("/security/api/v1/logout")
 		         .logoutSuccessUrl("/") //退出登录后的默认网址是”/home”
-		         
+		         .logoutSuccessHandler(myLogoutSuccessHandler()) //退出后 业务处理
 		         .permitAll()
 		         .invalidateHttpSession(true)
 		         .and()
 		         .rememberMe()//登录后记住用户，下次自动登录,数据库中必须存在名为persistent_logins的表
 		         .tokenValiditySeconds(1209600);
 		  http.addFilterBefore(myFilterSecurityInterceptor, FilterSecurityInterceptor.class);
+		  // 退出登录时删除session对应的cookie 
+		 // http.
+		  
+		  //session并发控制过滤器  只允许一个用户登录
+		  http.addFilterAt(concurrencyFilter(),ConcurrentSessionFilter.class);
+		  
+		  //只允许一个用户登录,如果同一个帐号两次登录，那么第一个账户将被提下线，跳转到登录页面
+		  http.sessionManagement().maximumSessions(1).expiredSessionStrategy(sessionInformationExpiredStrategy()).maxSessionsPreventsLogin(true);
+
 		  //session 失效跳转 参数为要跳转到的页面url
 	    //  http.sessionManagement().invalidSessionStrategy(invalidSessionStrategy);
 	      //只允许一个用户登录,如果同一个帐号两次登录，那么第一个账户将被提下线，跳转到登录页面
@@ -158,6 +172,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         //指定密码加密所使用的加密器为 bCryptPasswordEncoder()
         //需要将密码加密后写入数据库
     	 auth.userDetailsService(myUserDetailService).passwordEncoder(bCryptPasswordEncoder()); 
+    	 //不删除凭据，以便记住用户
     	 auth.eraseCredentials(false);
      }
 
@@ -199,7 +214,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     	 /*ConcurrentSessionControlAuthenticationStrategy concurrentSession = new MySessionAuthenticationFailureHandler(sessionRegistry);
     	 concurrentSession.setExceptionIfMaximumExceeded(true);
     	 return concurrentSession;*/
-    	 return null;
+    	 return new MyConcurrentSessionControlAuthenticationStrategy(sessionRegistry());
      }
      
      /**
@@ -211,7 +226,49 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     	 return new MyAccessDeniedHandler();
      }
      
+     /**
+      * session
+      * @return
+      */
+ 	 @Bean
+ 	 public SessionRegistry sessionRegistry() {
+ 		 //session注册表
+ 		return new SessionRegistryImpl();
+ 	 }
+  
+ 	 @Bean
+ 	 public ConcurrentSessionFilter concurrencyFilter() {
+ 		//ConcurrentSessionFilter 主要是判断session是否过期以及更新最新访问时间  通过代码HttpSession session = request.getSession(false);判断获取session
+ 		return new ConcurrentSessionFilter(sessionRegistry(),sessionInformationExpiredStrategy());
+  	}
      
+ 	 /** 
+ 	  * 注册 登出成功 bean
+ 	  * 
+ 	  * @return
+ 	  */
+ 	@Bean 
+ 	public LogoutSuccessHandler myLogoutSuccessHandler(){
+ 		return new MyLogoutSuccessHandler();
+ 	}
      
-     
+ 	/**
+ 	 * SpringSecurity内置的session监听器
+ 	 * @return
+ 	 */
+    @Bean
+    public HttpSessionEventPublisher httpSessionEventPublisher() {
+        return new HttpSessionEventPublisher();
+    }
+    
+    
+    /**
+     * session失效跳转
+     * @return
+     */
+    private SessionInformationExpiredStrategy sessionInformationExpiredStrategy() {
+       // return new SimpleRedirectSessionInformationExpiredStrategy("/login");
+    	System.out.println(" =============================================== ");
+    	return new MySessionInformationExpiredStrategy();
+    }
 }

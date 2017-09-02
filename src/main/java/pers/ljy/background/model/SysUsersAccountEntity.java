@@ -227,4 +227,26 @@ public class SysUsersAccountEntity implements Serializable {
     public void setCreateDate(Date createDate) {
         this.createDate = createDate;
     }
+    
+    /**
+     * 重写比较方法,SpringSecurity根据用户名来比较是否同一个用户
+     */
+    @Override
+    public boolean equals(Object o){
+        if(o.toString().equals(this.userName))
+            return true;
+        return false;
+    }
+
+    @Override
+    public int hashCode(){
+        return userName.hashCode();
+    }
+
+
+    @Override
+    public String toString() {
+        return this.userName;
+    }
+    
 }

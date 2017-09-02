@@ -37,7 +37,11 @@ public class MyLoginFailureHandler extends SimpleUrlAuthenticationFailureHandler
 		LOGGER.info("登陆失败.");
 	    ConcurrentMap <String, String> map = new ConcurrentHashMap<>();
         map.put("exception", exception.getLocalizedMessage());
-        ApiResultView view = new ApiResultView(ApiResultCode.FAIL.getCode(),"未知的用户名或者密码", map);
+        String exceptionMsg = "未知的用户名或者密码";
+        if(exception.getLocalizedMessage().equals("Maximum sessions of 1 for this principal exceeded")){
+        	exceptionMsg = "你的账号已经在其他地方登陆了";
+        }
+        ApiResultView view = new ApiResultView(ApiResultCode.FAIL.getCode(),exceptionMsg, map);
         SecurityReturnJson.writeJavaScript(response, view);
 
 	  // super.onAuthenticationFailure(request, response, exception);  
