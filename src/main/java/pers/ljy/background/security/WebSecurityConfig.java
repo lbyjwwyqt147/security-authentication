@@ -266,7 +266,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
      * session失效跳转
      * @return
      */
-    private SessionInformationExpiredStrategy sessionInformationExpiredStrategy() {
+    @Bean
+    public SessionInformationExpiredStrategy sessionInformationExpiredStrategy() {
        // return new SimpleRedirectSessionInformationExpiredStrategy("/login");
     	System.out.println(" =============================================== ");
     	return new MySessionInformationExpiredStrategy();
