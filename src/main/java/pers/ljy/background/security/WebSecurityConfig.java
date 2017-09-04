@@ -121,7 +121,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		  http.addFilterAt(concurrencyFilter(),ConcurrentSessionFilter.class);
 		  
 		  //只允许一个用户登录,如果同一个帐号两次登录，那么第一个账户将被提下线，跳转到登录页面
-		  http.sessionManagement().maximumSessions(1).expiredSessionStrategy(sessionInformationExpiredStrategy()).maxSessionsPreventsLogin(true);
+		  http.sessionManagement().sessionAuthenticationStrategy(mySessionAuthenticationFailureHandler()).maximumSessions(1).expiredSessionStrategy(sessionInformationExpiredStrategy()).sessionRegistry(sessionRegistry()).maxSessionsPreventsLogin(true);
 
 		  //session 失效跳转 参数为要跳转到的页面url
 	    //  http.sessionManagement().invalidSessionStrategy(invalidSessionStrategy);
