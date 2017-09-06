@@ -3,16 +3,20 @@ package pers.ljy.background.security;
 
 import java.util.Collection;
 import java.util.HashSet;
-
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
+
+import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.session.SessionInformation;
+import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -60,6 +64,9 @@ public class MyUserDetailService implements UserDetailsService {
 	private SysRoleService roleService;
 	@Autowired
 	private SysUserRoleService userRoleService;
+	@Resource
+    private SessionRegistry sessionRegistry;
+	
 	
 	@Override
 	public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
@@ -69,6 +76,26 @@ public class MyUserDetailService implements UserDetailsService {
 		if(users == null){
 			throw new UsernameNotFoundException("UserName " + userName + " not found"); 
 		}
+		
+		/**如果同一帐号已经在其他地方登录 就踢出在线用户 (被踢出的用户需要重新登录才可以继续访问服务器) 开始 */
+		//获取全部在线用户
+    	List<Object> allPrincipals = sessionRegistry.getAllPrincipals();
+    	for (int i = 0; i<allPrincipals.size(); i++) {
+			User user = (User) allPrincipals.get(i);
+			if(user.getUsername().equals("admin")){
+				List<SessionInformation> allSessions = sessionRegistry.getAllSessions(user, false);
+				if(allSessions != null){
+					allSessions.forEach(item ->{
+						//session 失效
+						item.expireNow();
+                        //下面代码是不需要的  如果加上 会出现 被踢出的用户 还可以继续访问服务器
+					//	sessionRegistry.removeSessionInformation(item.getSessionId());
+					});
+				}
+			}
+		}
+    	/**踢出在线用户 结束*/
+		
 		
 		// 取得用户的权限
 		CopyOnWriteArrayList<SysUserRoleEntity> userRoleList = this.userRoleService.selectUserRoleByUserId(users.getUserId());

@@ -3,7 +3,6 @@ package pers.ljy.background.security;
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -31,6 +30,7 @@ import pers.ljy.background.share.utils.SecurityReturnJson;
  */
 public class MyLoginFailureHandler extends SimpleUrlAuthenticationFailureHandler {
 	private final static Logger LOGGER = LoggerFactory.getLogger(MyLoginFailureHandler.class);
+
 	@Override  
 	public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,  
 	            AuthenticationException exception) throws IOException, ServletException {  

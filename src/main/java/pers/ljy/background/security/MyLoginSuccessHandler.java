@@ -69,7 +69,7 @@ public class MyLoginSuccessHandler extends SavedRequestAwareAuthenticationSucces
         
         LOGGER.info("sessionId :" + request.getSession().getId());
         
-        //当用户登录验证成功后 注册session
+        //当用户登录验证成功后 注册session(踢出在线用户时要用)
         sessionRegistry.registerNewSession(sessionId,authentication.getPrincipal());
         
         ConcurrentMap <String, String> map = new ConcurrentHashMap<>();
