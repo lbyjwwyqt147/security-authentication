@@ -82,7 +82,7 @@ public class MyUserDetailService implements UserDetailsService {
     	List<Object> allPrincipals = sessionRegistry.getAllPrincipals();
     	for (int i = 0; i<allPrincipals.size(); i++) {
 			User user = (User) allPrincipals.get(i);
-			if(user.getUsername().equals("admin")){
+			if(user.getUsername().equals(userName)){
 				List<SessionInformation> allSessions = sessionRegistry.getAllSessions(user, false);
 				if(allSessions != null){
 					allSessions.forEach(item ->{
