@@ -105,6 +105,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		         .failureHandler(loginFailureHandler()) //登录失败 业务处理
 		  .and()
 		         .logout()
+		         .deleteCookies("remove")       //删除cookies
 		         .logoutUrl("/security/api/v1/logout")
 		         .logoutSuccessUrl("/") //退出登录后的默认网址是”/home”
 		         .logoutSuccessHandler(myLogoutSuccessHandler()) //退出后 业务处理
