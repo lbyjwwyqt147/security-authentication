@@ -1,6 +1,7 @@
 package pers.ljy.background.web.vo.authority;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 import pers.ljy.background.model.SysUserRoleEntity;
@@ -73,7 +74,10 @@ public class UserRoleVo extends BasicVo {
      */
     private Set<SysUserRoleEntity> userRoleList;
 
-    
+    /**
+     * 用户拥有的资源
+     */
+    private List<String> menusList;
     
 	public Integer getId() {
 		return id;
@@ -161,6 +165,14 @@ public class UserRoleVo extends BasicVo {
 
 	public void setUserRoleList(Set<SysUserRoleEntity> userRoleList) {
 		this.userRoleList = userRoleList;
+	}
+
+	public List<String> getMenusList() {
+		return menusList;
+	}
+
+	public void setMenusList(List<String> menusList) {
+		this.menusList = menusList;
 	}
     
     

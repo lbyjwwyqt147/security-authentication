@@ -9,17 +9,21 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.authentication.session.ConcurrentSessionControlAuthenticationStrategy;
 import org.springframework.security.web.session.ConcurrentSessionFilter;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
 import org.springframework.security.web.session.SessionInformationExpiredStrategy;
 import org.springframework.security.web.session.SimpleRedirectSessionInformationExpiredStrategy;
+
+import pers.ljy.background.jwt.JwtAuthenticationTokenFilter;
 
 
 /***
@@ -83,14 +87,18 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     	    */
     	// http.addFilterBefore(simpleCORSFilter, ChannelProcessingFilter.class); 跨域
 
-    	 http.csrf().disable()
+    	 http.csrf().disable()  // 由于使用的是JWT，这里我们不需要csrf
+    	      
+    	         .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) // 基于token，所以不需要session  如果基于session 则表使用这段代码
+    	          .and()
 		         .authorizeRequests()
 		         .antMatchers("/security/api/v1/logout","/security/api/v1/users/logins","/security/api/v1/users/signins","/security/api/v1/resourceMenus/*").permitAll()//访问：这些路径 无需登录认证权限
+	             .antMatchers("/auth/**").permitAll() // 对于获取token的rest api要允许匿名访问
 		         .anyRequest().authenticated() //其他所有资源都需要认证，登陆后访问
 		         //.antMatchers("/resources").hasAuthority("ADMIN") //登陆后之后拥有“ADMIN”权限才可以访问/hello方法，否则系统会出现“403”权限不足的提示
 		         .and().exceptionHandling().accessDeniedHandler(myAccessDeniedHandler()) //无权限,权限不足访问 使用myAccessDeniedHandler()做业务处理。
-		         .and()
-		         .exceptionHandling().authenticationEntryPoint(myLoginAuthenticationFailureHandler())    //未登录状态(没有登录)下 使用myLoginAuthenticationFailureHandler()做业务处理。
+		        // .and()  (基于session 则取消后面代码，基于token 则注释)
+		         //.exceptionHandling().authenticationEntryPoint(myLoginAuthenticationFailureHandler())    //未登录状态(没有登录)下 使用myLoginAuthenticationFailureHandler()做业务处理。
 		         
 		  .and()
 		         .formLogin()
@@ -118,12 +126,21 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		  // 退出登录时删除session对应的cookie 
 		 // http.
 		  
-		  //session并发控制过滤器  只允许一个用户登录
-		  http.addFilterAt(concurrencyFilter(),ConcurrentSessionFilter.class);
+		  //(基于session 则使用下面代码,基于token则不使用)session并发控制过滤器  只允许一个用户登录
+		  //http.addFilterAt(concurrencyFilter(),ConcurrentSessionFilter.class);
 		  
-		  //只允许一个用户登录,如果同一个帐号两次登录，那么第一个账户将被提下线，跳转到登录页面
-		  http.sessionManagement().sessionAuthenticationStrategy(mySessionAuthenticationFailureHandler()).maximumSessions(1).expiredSessionStrategy(sessionInformationExpiredStrategy()).sessionRegistry(sessionRegistry()).maxSessionsPreventsLogin(true);
+		  //(基于session 则使用下面代码,基于token则不使用)只允许一个用户登录,如果同一个帐号两次登录，那么第一个账户将被提下线，跳转到登录页面
+		//  http.sessionManagement().sessionAuthenticationStrategy(mySessionAuthenticationFailureHandler()).maximumSessions(1).expiredSessionStrategy(sessionInformationExpiredStrategy()).sessionRegistry(sessionRegistry()).maxSessionsPreventsLogin(true);
 
+		  
+		// 添加JWT filter
+		  http.addFilterBefore(authenticationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class);
+
+		  
+		  
+		  // 禁用缓存
+		  http.headers().cacheControl();
+		  
 		  //session 失效跳转 参数为要跳转到的页面url
 	    //  http.sessionManagement().invalidSessionStrategy(invalidSessionStrategy);
 	      //只允许一个用户登录,如果同一个帐号两次登录，那么第一个账户将被提下线，跳转到登录页面
@@ -175,6 +192,16 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     	 auth.userDetailsService(myUserDetailService).passwordEncoder(bCryptPasswordEncoder()); 
     	 //不删除凭据，以便记住用户
     	 auth.eraseCredentials(false);
+     }
+
+     /**
+      * 注册 集成JWT
+      * @return
+      * @throws Exception
+      */
+     @Bean
+     public JwtAuthenticationTokenFilter authenticationTokenFilterBean() throws Exception {
+         return new JwtAuthenticationTokenFilter();
      }
 
 

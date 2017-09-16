@@ -22,6 +22,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
+
+import pers.ljy.background.jwt.JWTUserDetailsFactory;
 import pers.ljy.background.model.SysResourceMenusEntity;
 import pers.ljy.background.model.SysUserRoleEntity;
 import pers.ljy.background.model.SysUsersAccountEntity;
@@ -80,7 +82,7 @@ public class MyUserDetailService implements UserDetailsService {
 		/**如果同一帐号已经在其他地方登录 就踢出在线用户 (被踢出的用户需要重新登录才可以继续访问服务器) 开始 */
 		//获取全部在线用户
     	List<Object> allPrincipals = sessionRegistry.getAllPrincipals();
-    	for (int i = 0; i<allPrincipals.size(); i++) {
+    	/*for (int i = 0; i<allPrincipals.size(); i++) {
 			User user = (User) allPrincipals.get(i);
 			if(user.getUsername().equals(userName)){
 				List<SessionInformation> allSessions = sessionRegistry.getAllSessions(user, false);
@@ -93,7 +95,7 @@ public class MyUserDetailService implements UserDetailsService {
 					});
 				}
 			}
-		}
+		}*/
     	/**踢出在线用户 结束*/
 		
 		
@@ -117,7 +119,12 @@ public class MyUserDetailService implements UserDetailsService {
 		       // 封装成spring security的user
 		       User userDetail = new User(users.getUserName(), users.getUserPwd(),
 		                grantedAuths);
-		       return userDetail;
+		      
+		       //如果不使用 jwt 则取消下面注释
+		       //return userDetail;
+		       
+		       //如果使用JWT 则使用下面代码  不使用可以去掉，也可以继续使用
+		       return JWTUserDetailsFactory.create(userDetail, users.getUserId().longValue(), users.getCreateDate());
 		} catch (Exception e) {
 			  e.printStackTrace();
 			  LOGGER.error("登录权限效验出现异常.");

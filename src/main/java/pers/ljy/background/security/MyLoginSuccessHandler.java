@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,6 +21,8 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 
+import pers.ljy.background.jwt.JWTUserDetails;
+import pers.ljy.background.jwt.JwtTokenUtils;
 import pers.ljy.background.share.result.ApiResultCode;
 import pers.ljy.background.share.result.ApiResultView;
 import pers.ljy.background.share.utils.SecurityReturnJson;
@@ -42,6 +45,8 @@ public class MyLoginSuccessHandler extends SavedRequestAwareAuthenticationSucces
 	
 	@Resource
     private SessionRegistry sessionRegistry;
+	@Autowired
+	private JwtTokenUtils jwtTokenUtils;
 	
 	/**
 	 * 登陆成功后会调用这里
@@ -49,9 +54,12 @@ public class MyLoginSuccessHandler extends SavedRequestAwareAuthenticationSucces
 	@Override
 	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
 			Authentication authentication) throws ServletException, IOException {
-		//获得授权后可得到用户信息  
-		User userDetails =  (User) authentication.getPrincipal();
+		//获得授权后可得到用户信息   如果不使用jwt 则取消注释 
+		//User userDetails =  (User) authentication.getPrincipal();
       
+		//使用jwt 
+		JWTUserDetails userDetails =  (JWTUserDetails) authentication.getPrincipal();
+		
 		//将身份 存储到SecurityContext里
         SecurityContext securityContext = SecurityContextHolder.getContext();
         securityContext.setAuthentication(authentication);
@@ -74,12 +82,15 @@ public class MyLoginSuccessHandler extends SavedRequestAwareAuthenticationSucces
         
         ConcurrentMap <String, String> map = new ConcurrentHashMap<>();
         // 登陆成功后返回一个加密token  以后通过token进行权限验证
-        map.put("token",sessionId);
+        final String token = jwtTokenUtils.generateAccessToken(userDetails);
+        LOGGER.info("x-auth-token :" + token);
+        map.put("token",token);
         map.put("SESSION", sessionId);
         Cookie sessionCookie = new Cookie("SESSION",sessionId);
-        Cookie tokenCookie = new Cookie("token",sessionId);
+        Cookie tokenCookie = new Cookie("x-auth-token",token);
         response.addCookie(sessionCookie);
         response.addCookie(tokenCookie);
+        response.addHeader("x-auth-token",token);
         ApiResultView view = new ApiResultView(ApiResultCode.SUCCESS.getCode(), ApiResultCode.SUCCESS.getMsg(), map);
         SecurityReturnJson.writeJavaScript(response, view);
         
