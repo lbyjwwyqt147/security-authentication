@@ -7,19 +7,23 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import pers.ljy.background.share.redis.RedisService;
+
 /***
  * 集成JWT和Spring Security
  * 
+ * 每次请求接口时 就会进入这里验证token 是否合法
  * @author ljy
  *
  */
@@ -29,6 +33,9 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
 	@Autowired
     private UserDetailsService userDetailsService;
 
+	@Autowired
+	private RedisService redisService;
+	
     @Autowired
     private JwtTokenUtils jwtTokenUtil;
 
@@ -43,30 +50,36 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
             HttpServletRequest request,
             HttpServletResponse response,
             FilterChain chain) throws ServletException, IOException {
-        String authHeader = request.getHeader(this.tokenHeader);
-       // if (authHeader != null && authHeader.startsWith(tokenHead)) {
-        if (authHeader != null ) {
-           // final String authToken = authHeader.substring(tokenHead.length()); // The part after "Bearer "
-        	final String authToken = authHeader;
-            String username = jwtTokenUtil.getUsernameFromToken(authToken);
+    	
+	    	String authHeader = request.getHeader(this.tokenHeader);
+	        if (authHeader != null && authHeader.startsWith(tokenHead)) {
+	              final String authToken = authHeader.substring(tokenHead.length()); // The part after "Bearer-"
+	              String username = jwtTokenUtil.getUsernameFromToken(authToken);
+	              Long userId = jwtTokenUtil.getUserIdFromToken(authToken);
+	              //获取当前用户在redis 中的token
+	              String tokenRedisKey = "security-jwt-"+userId+"-token";
+	              String redisToken = (String) redisService.get(tokenRedisKey);
+	              //如果token 未过期(存在)就验证是否合法    不存在则直接返回不合法
+	              if(StringUtils.isNotBlank(redisToken)){
+	            	  logger.info("checking authentication " + username);
 
-            logger.info("checking authentication " + username);
+	            	  if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+	            		  //得到用户信息
+	            		  JWTUserDetails userDetails = (JWTUserDetails) this.userDetailsService.loadUserByUsername(username);
 
-                JWTUserDetails userDetails = (JWTUserDetails) this.userDetailsService.loadUserByUsername(username);
-
-                if (jwtTokenUtil.validateToken(authToken, userDetails)) {
-                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                            userDetails, null, userDetails.getAuthorities());
-                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(
-                            request));
-                    logger.info("authenticated user " + username + ", setting security context");
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
-                }
-            }
-        }
-
+	            		  //验证token 是否合法
+	            		  if (jwtTokenUtil.validateToken(authToken, userDetails)) {
+	            			  UsernamePasswordAuthenticationToken userAuthentication = new UsernamePasswordAuthenticationToken(
+	            					  userDetails, null, userDetails.getAuthorities());
+	            			  userAuthentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(
+	            					  request));
+	            			  logger.info("authenticated user " + username + ", setting security context");
+	            			  SecurityContextHolder.getContext().setAuthentication(userAuthentication);
+	            		  }
+	            	  }
+	          }
+	    } 
         chain.doFilter(request, response);
     }
 

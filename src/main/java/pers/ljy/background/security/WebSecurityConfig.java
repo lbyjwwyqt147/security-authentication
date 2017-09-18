@@ -23,7 +23,9 @@ import org.springframework.security.web.session.HttpSessionEventPublisher;
 import org.springframework.security.web.session.SessionInformationExpiredStrategy;
 import org.springframework.security.web.session.SimpleRedirectSessionInformationExpiredStrategy;
 
+import pers.ljy.background.jwt.JWTRestAuthenticationEntryPoint;
 import pers.ljy.background.jwt.JwtAuthenticationTokenFilter;
+import pers.ljy.background.jwt.MyJwtAuthenticationFailureHandler;
 
 
 /***
@@ -90,7 +92,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     	 http.csrf().disable()  // 由于使用的是JWT，这里我们不需要csrf
     	      
     	         .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) // 基于token，所以不需要session  如果基于session 则表使用这段代码
-    	          .and()
+    	         .and()
 		         .authorizeRequests()
 		         .antMatchers("/security/api/v1/logout","/security/api/v1/users/logins","/security/api/v1/users/signins","/security/api/v1/resourceMenus/*").permitAll()//访问：这些路径 无需登录认证权限
 	             .antMatchers("/auth/**").permitAll() // 对于获取token的rest api要允许匿名访问
@@ -99,7 +101,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		         .and().exceptionHandling().accessDeniedHandler(myAccessDeniedHandler()) //无权限,权限不足访问 使用myAccessDeniedHandler()做业务处理。
 		        // .and()  (基于session 则取消后面代码，基于token 则注释)
 		         //.exceptionHandling().authenticationEntryPoint(myLoginAuthenticationFailureHandler())    //未登录状态(没有登录)下 使用myLoginAuthenticationFailureHandler()做业务处理。
-		         
+		        
+		         //基于token 认证  认证失败配置
+		         .and().exceptionHandling().authenticationEntryPoint(jwtRestAuthenticationEntryPoint())    // token 认证失败 使用 jwtRestAuthenticationEntryPoint() 做业务处理
+		         //.and().exceptionHandling().
 		  .and()
 		         .formLogin()
 		         .loginProcessingUrl("/security/api/v1/users/logins")
@@ -205,6 +210,27 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
      }
 
 
+     /**
+      * 注册 集成JWT 权限认证失败
+      * @return
+      * @throws Exception
+      */
+     @Bean
+     public JWTRestAuthenticationEntryPoint jwtRestAuthenticationEntryPoint() throws Exception {
+         return new JWTRestAuthenticationEntryPoint();
+     }
+
+     /**
+      * 注册 集成JWT token 认证无权限时处理
+      * @return
+      * @throws Exception
+      */
+     @Bean
+     public MyJwtAuthenticationFailureHandler myJwtAuthenticationFailureHandler() throws Exception {
+         return new MyJwtAuthenticationFailureHandler();
+     }
+     
+     
      /**
       * 注册登录成功的bean
       * @return

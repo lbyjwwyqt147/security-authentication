@@ -10,9 +10,11 @@ import java.util.UUID;
 
 import javax.enterprise.inject.New;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -52,7 +54,7 @@ public class JwtTokenUtils {
     private final SignatureAlgorithm SIGNATURE_ALGORITHM = SignatureAlgorithm.HS256;
 
     public JWTUserDetails getUserFromToken(String token) {
-        JWTUserDetails user;
+        JWTUserDetails  jwtUserDetails;
         try {
             final Claims claims = getClaimsFromToken(token);
             long userId = getUserIdFromToken(token);
@@ -62,19 +64,20 @@ public class JwtTokenUtils {
             boolean account_enabled = (Boolean) claims.get(CLAIM_KEY_ACCOUNT_ENABLED);
             boolean account_non_locked = (Boolean) claims.get(CLAIM_KEY_ACCOUNT_NON_LOCKED);
             boolean account_non_expired = (Boolean) claims.get(CLAIM_KEY_ACCOUNT_NON_EXPIRED);
-            user =  null;
-           // user = JWTUserDetailsFactory.create(user, userId,new Date());
+        	User user = new User(username, "", account_enabled, account_non_expired, account_non_expired, account_non_locked, authorities);
+
+        	jwtUserDetails = JWTUserDetailsFactory.create(user, userId,new Date());
         } catch (Exception e) {
-            user = null;
+        	jwtUserDetails = null;
         }
-        return user;
+        return jwtUserDetails;
     }
 
     public long getUserIdFromToken(String token) {
         long userId;
         try {
             final Claims claims = getClaimsFromToken(token);
-            userId = Long.valueOf(claims.get(CLAIM_KEY_USER_ID).toString());
+            userId = Long.valueOf(claims != null ? claims.get(CLAIM_KEY_USER_ID).toString() :"0");
         } catch (Exception e) {
         	e.printStackTrace();
             userId = 0;
@@ -115,12 +118,17 @@ public class JwtTokenUtils {
         return expiration;
     }
 
+    /***
+     * 解析token 信息
+     * @param token
+     * @return
+     */
     private Claims getClaimsFromToken(String token) {
         Claims claims;
         try {
             claims = Jwts.parser()
-                    .setSigningKey(secret)
-                    .parseClaimsJws(token)
+                    .setSigningKey(secret)   //签名的key
+                    .parseClaimsJws(token)   // 签名token
                     .getBody();
         } catch (Exception e) {
             claims = null;
@@ -211,13 +219,13 @@ public class JwtTokenUtils {
 
     private String generateToken(String subject, Map<String, Object> claims, long expiration) {
         return Jwts.builder()
-                .setClaims(claims)
-                .setSubject(subject)
+                .setClaims(claims)   //一个map 可以资源存放东西进去
+                .setSubject(subject) // 用户名
                 .setId(UUID.randomUUID().toString())
                 .setIssuedAt(new Date())
-                .setExpiration(generateExpirationDate(expiration))
+                .setExpiration(generateExpirationDate(expiration))  //过期时间
                 .compressWith(CompressionCodecs.DEFLATE)
-                .signWith(SIGNATURE_ALGORITHM, secret)
+                .signWith(SIGNATURE_ALGORITHM, secret) //数字签名
                 .compact();
     }
 

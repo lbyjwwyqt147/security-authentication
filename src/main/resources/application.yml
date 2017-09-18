@@ -40,12 +40,17 @@ basic:
 
 # JWT
 jwt:
-  header: x-auth-token
+  header: Authorization
+  # 密匙key
   secret: mySecret
-  expiration: 604800
-  tokenHead: "Bearer "
-  access_token: 3600
-  refresh_token: 3600
+  # 超时时间   单位秒
+  expiration: 300
+  # 自定义token 前缀字符
+  tokenHead: "Bearer-"
+  # 超时时间   单位秒
+  access_token: 300
+  # 刷新token时间   单位秒
+  refresh_token: 300
   route:
     authentication:
       path: auth
