@@ -107,21 +107,24 @@ public class MyLoginSuccessHandler extends SavedRequestAwareAuthenticationSucces
         	
         }else {
         	// 登陆成功后返回一个加密token  以后通过token进行权限验证
-            token = tokenHead+jwtTokenUtils.generateAccessToken(userDetails);
+            token = jwtTokenUtils.generateAccessToken(userDetails);
             
         	 //登录成功后将用户的uid 和token 存放在redis中 或者数据库中   我这里存放到redis中
             redisService.set(tokenRedisKey, token, expiration);
 		}
-        
+        String access_token = tokenHead+token;
+        String refresh_token = tokenHead+jwtTokenUtils.refreshToken(token);
       
-        LOGGER.info(tokenHeader+" :" + token);
-        map.put("token",token);
+        LOGGER.info(tokenHeader+" :" + access_token);
+        map.put("token",access_token);
         map.put("SESSION", sessionId);
+        map.put("access_token", access_token);
+        map.put("refresh_token", refresh_token);
         Cookie sessionCookie = new Cookie("SESSION",sessionId);
-        Cookie tokenCookie = new Cookie("token",token);
+        Cookie tokenCookie = new Cookie("token",access_token);
         response.addCookie(sessionCookie);
         response.addCookie(tokenCookie);
-        response.addHeader(tokenHeader,token);
+        response.addHeader(tokenHeader,access_token);
         
         
         ApiResultView view = new ApiResultView(ApiResultCode.SUCCESS.getCode(), ApiResultCode.SUCCESS.getMsg(), map);
