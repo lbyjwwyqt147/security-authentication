@@ -40,17 +40,18 @@ basic:
 
 # JWT
 jwt:
+  # 存放Token的Header Key
   header: Authorization
   # 密匙key
   secret: mySecret
   # 超时时间   单位秒
-  expiration: 300
+  expiration: 3600
   # 自定义token 前缀字符
   tokenHead: "Bearer-"
   # 超时时间   单位秒
-  access_token: 300
+  access_token: 3600
   # 刷新token时间   单位秒
-  refresh_token: 300
+  refresh_token: 3600
   route:
     authentication:
       path: auth

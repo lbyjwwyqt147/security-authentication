@@ -8,9 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import javax.enterprise.inject.New;
-
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -24,7 +21,6 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.impl.compression.CompressionCodecs;
-import javassist.compiler.ast.NewExpr;
 
 /***
  * jwt-token工具类
@@ -51,8 +47,14 @@ public class JwtTokenUtils {
     @Value("${jwt.refresh_token}")
     private Long refresh_token_expiration;
 
+    //签名方式
     private final SignatureAlgorithm SIGNATURE_ALGORITHM = SignatureAlgorithm.HS256;
 
+    /**
+     * 根据token 获取用户信息
+     * @param token
+     * @return
+     */
     public JWTUserDetails getUserFromToken(String token) {
         JWTUserDetails  jwtUserDetails;
         try {
@@ -73,6 +75,11 @@ public class JwtTokenUtils {
         return jwtUserDetails;
     }
 
+    /**
+     * 根据token 获取用户ID
+     * @param token
+     * @return
+     */
     public long getUserIdFromToken(String token) {
         long userId;
         try {
@@ -85,6 +92,11 @@ public class JwtTokenUtils {
         return userId;
     }
 
+    /**
+     * 根据token 获取用户名
+     * @param token
+     * @return
+     */
     public String getUsernameFromToken(String token) {
         String username;
         try {
@@ -96,6 +108,11 @@ public class JwtTokenUtils {
         return username;
     }
 
+    /**
+     * 根据token 获取生成时间
+     * @param token
+     * @return
+     */
     public Date getCreatedDateFromToken(String token) {
         Date created;
         try {
@@ -107,6 +124,11 @@ public class JwtTokenUtils {
         return created;
     }
 
+    /**
+     * 根据token 获取过期时间
+     * @param token
+     * @return
+     */
     public Date getExpirationDateFromToken(String token) {
         Date expiration;
         try {
@@ -136,19 +158,40 @@ public class JwtTokenUtils {
         return claims;
     }
 
+    /**
+     * 生成失效时间
+     * @param expiration
+     * @return
+     */
     private Date generateExpirationDate(long expiration) {
         return new Date(System.currentTimeMillis() + expiration * 1000);
     }
 
+    /**
+     * token 是否过期
+     * @param token
+     * @return
+     */
     private Boolean isTokenExpired(String token) {
         final Date expiration = getExpirationDateFromToken(token);
         return expiration.before(new Date());
     }
 
+    /**
+     * 生成时间是否在最后修改时间之前
+     * @param created   生成时间
+     * @param lastPasswordReset  最后修改密码时间
+     * @return
+     */
     private Boolean isCreatedBeforeLastPasswordReset(Date created, Date lastPasswordReset) {
         return (lastPasswordReset != null && created.before(lastPasswordReset));
     }
 
+    /**
+     * 根据用户信息 生成token
+     * @param userDetails
+     * @return
+     */
     public String generateAccessToken(UserDetails userDetails) {
         JWTUserDetails user = (JWTUserDetails) userDetails;
         Map<String, Object> claims = generateClaims(user);
@@ -156,6 +199,7 @@ public class JwtTokenUtils {
         return generateAccessToken(user.getUsername(), claims);
     }
 
+    
     private Map<String, Object> generateClaims(JWTUserDetails user) {
         Map<String, Object> claims = new HashMap<>();
         claims.put(CLAIM_KEY_USER_ID, user.getUserId());
@@ -165,10 +209,21 @@ public class JwtTokenUtils {
         return claims;
     }
 
+    /**
+     * 生成token
+     * @param subject  用户名
+     * @param claims   
+     * @return
+     */
     private String generateAccessToken(String subject, Map<String, Object> claims) {
         return generateToken(subject, claims, access_token_expiration);
     }
 
+    /**
+     * 用户所拥有的资源权限
+     * @param authorities
+     * @return
+     */
     private List<?> authoritiesToArray(Collection<? extends GrantedAuthority> authorities) {
         List<String> list = new ArrayList<>();
         for (GrantedAuthority ga : authorities) {
@@ -187,6 +242,11 @@ public class JwtTokenUtils {
         return authorities;
     }
 
+    /**
+     * 根据用户信息 重新获取token
+     * @param userDetails
+     * @return
+     */
     public String generateRefreshToken(UserDetails userDetails) {
         JWTUserDetails user = (JWTUserDetails) userDetails;
         Map<String, Object> claims = generateClaims(user);
@@ -196,6 +256,12 @@ public class JwtTokenUtils {
         return generateRefreshToken(user.getUsername(), claims);
     }
 
+    /**
+     * 重新获取token
+     * @param subject 用户名
+     * @param claims
+     * @return
+     */
     private String generateRefreshToken(String subject, Map<String, Object> claims) {
         return generateToken(subject, claims, refresh_token_expiration);
     }
@@ -206,6 +272,11 @@ public class JwtTokenUtils {
                 && (!isTokenExpired(token));
     }
 
+    /**
+     * 刷新重新获取token
+     * @param token 源token
+     * @return
+     */
     public String refreshToken(String token) {
         String refreshedToken;
         try {
@@ -220,7 +291,7 @@ public class JwtTokenUtils {
     private String generateToken(String subject, Map<String, Object> claims, long expiration) {
         return Jwts.builder()
                 .setClaims(claims)   //一个map 可以资源存放东西进去
-                .setSubject(subject) // 用户名
+                .setSubject(subject) //  用户名写入标题
                 .setId(UUID.randomUUID().toString())
                 .setIssuedAt(new Date())
                 .setExpiration(generateExpirationDate(expiration))  //过期时间
@@ -229,6 +300,12 @@ public class JwtTokenUtils {
                 .compact();
     }
 
+    /**
+     * 验证token 是否合法
+     * @param token  token 
+     * @param userDetails  用户信息
+     * @return
+     */
     public Boolean validateToken(String token, UserDetails userDetails) {
         JWTUserDetails user = (JWTUserDetails) userDetails;
         final long userId = getUserIdFromToken(token);

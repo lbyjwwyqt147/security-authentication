@@ -78,6 +78,8 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
 	            			  SecurityContextHolder.getContext().setAuthentication(userAuthentication);
 	            		  }
 	            	  }
+	          }else{
+	        	  logger.info(" redis 中token 已经过期,需要重新登录.");
 	          }
 	    } 
         chain.doFilter(request, response);

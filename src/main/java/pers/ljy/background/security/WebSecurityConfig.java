@@ -93,7 +93,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     	      
     	         .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) // 基于token，所以不需要session  如果基于session 则表使用这段代码
     	         .and()
-		         .authorizeRequests()
+		         .authorizeRequests()   //对请求进行认证
 		         .antMatchers("/security/api/v1/logout","/security/api/v1/users/logins","/security/api/v1/users/signins","/security/api/v1/resourceMenus/*").permitAll()//访问：这些路径 无需登录认证权限
 	             .antMatchers("/auth/**").permitAll() // 对于获取token的rest api要允许匿名访问
 		         .anyRequest().authenticated() //其他所有资源都需要认证，登陆后访问
@@ -138,7 +138,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		//  http.sessionManagement().sessionAuthenticationStrategy(mySessionAuthenticationFailureHandler()).maximumSessions(1).expiredSessionStrategy(sessionInformationExpiredStrategy()).sessionRegistry(sessionRegistry()).maxSessionsPreventsLogin(true);
 
 		  
-		// 添加JWT filter
+		  // 添加JWT filter 验证其他请求的Token是否合法
 		  http.addFilterBefore(authenticationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class);
 
 		  

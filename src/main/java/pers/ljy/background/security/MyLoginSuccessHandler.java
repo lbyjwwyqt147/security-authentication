@@ -118,13 +118,10 @@ public class MyLoginSuccessHandler extends SavedRequestAwareAuthenticationSucces
         map.put("token",token);
         map.put("SESSION", sessionId);
         Cookie sessionCookie = new Cookie("SESSION",sessionId);
-        Cookie tokenCookie = new Cookie("x-auth-token",token);
+        Cookie tokenCookie = new Cookie("token",token);
         response.addCookie(sessionCookie);
         response.addCookie(tokenCookie);
-        response.addHeader("x-auth-token",token);
-        
-        
-       
+        response.addHeader(tokenHeader,token);
         
         
         ApiResultView view = new ApiResultView(ApiResultCode.SUCCESS.getCode(), ApiResultCode.SUCCESS.getMsg(), map);
