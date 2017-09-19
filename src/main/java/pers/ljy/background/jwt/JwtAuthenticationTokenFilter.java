@@ -1,6 +1,8 @@
 package pers.ljy.background.jwt;
 
 import java.io.IOException;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -18,7 +20,11 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import pers.ljy.background.share.exception.BusinessException;
 import pers.ljy.background.share.redis.RedisService;
+import pers.ljy.background.share.result.ApiResultCode;
+import pers.ljy.background.share.result.ApiResultView;
+import pers.ljy.background.share.utils.SecurityReturnJson;
 
 /***
  * 集成JWT和Spring Security
@@ -80,6 +86,11 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
 	            	  }
 	          }else{
 	        	  logger.info(" redis 中token 已经过期,需要重新登录.");
+	        	  
+	        	  //throw new BusinessException("请重新登录系统.");
+	        	  //返回json形式的错误信息  
+	             // ApiResultView view = new ApiResultView(ApiResultCode.ERROR.getCode(),"请重新登录进入系统.", null);
+	             // SecurityReturnJson.writeJavaScript(response, view);
 	          }
 	    } 
         chain.doFilter(request, response);
