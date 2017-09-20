@@ -72,11 +72,12 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
 	              Date createTokenDate = jwtTokenUtil.getCreatedDateFromToken(authToken);  //获取token生成时间
 	              Long differSeconds = DateUtils.getDistanceSeconds(System.currentTimeMillis(), createTokenDate.getTime());
 	              boolean isExpire = expiration > differSeconds;
-	              if(isExpire){  //如果 请求接口时间在token 过期之前 则更新token过期时间
-	            	 String token = jwtTokenUtil.restTokenExpired(authToken,expiration+differSeconds);
-	            	 System.out.println(token);
+	              if(isExpire){  //如果 请求接口时间在token 过期之前 则更新token过期时间  我们可以将用户的token 存放到redis 中,更新redis 的过期时间
+	                   
+	            	  //更新 延长 redis 中的过期时间
+	            	  
+	              
 	              }
-	              System.out.println(DateUtils.format(jwtTokenUtil.getExpirationDateFromToken(authToken)));
 	              String username = jwtTokenUtil.getUsernameFromToken(authToken);
 	              Long userId = jwtTokenUtil.getUserIdFromToken(authToken);
 	              //获取当前用户在redis 中的token
