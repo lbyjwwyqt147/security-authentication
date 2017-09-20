@@ -110,7 +110,8 @@ public class MyLoginSuccessHandler extends SavedRequestAwareAuthenticationSucces
             token = jwtTokenUtils.generateAccessToken(userDetails);
             
         	 //登录成功后将用户的uid 和token 存放在redis中 或者数据库中   我这里存放到redis中
-            redisService.set(tokenRedisKey, token, expiration);
+             redisService.set(tokenRedisKey, token, expiration);
+            //redisService.set(tokenRedisKey, token);
 		}
         String access_token = tokenHead+token;
         String refresh_token = tokenHead+jwtTokenUtils.refreshToken(token);

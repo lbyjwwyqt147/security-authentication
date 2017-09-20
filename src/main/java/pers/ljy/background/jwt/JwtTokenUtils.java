@@ -21,6 +21,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.impl.compression.CompressionCodecs;
+import pers.ljy.background.share.utils.DateUtils;
 
 /***
  * jwt-token工具类
@@ -199,6 +200,22 @@ public class JwtTokenUtils {
         return generateAccessToken(user.getUsername(), claims);
     }
 
+    /**
+     * 重置(更新)token 过期时间
+     * @param token
+     * @param expiration
+     */
+    public String restTokenExpired(String token,long expiration){
+    
+    	final Claims claims = getClaimsFromToken(token);
+    	Jwts.builder()
+        .setClaims(claims)   //一个map 可以资源存放东西进去
+        .setSubject(claims.getSubject()) //  用户名写入标题
+    	.setExpiration(new Date(expiration));
+        //claims.setExpiration(new Date(expiration));
+       // String refreshedToken = generateAccessToken(claims.getSubject(), claims,expiration);
+        return "";
+    }
     
     private Map<String, Object> generateClaims(JWTUserDetails user) {
         Map<String, Object> claims = new HashMap<>();
@@ -219,6 +236,17 @@ public class JwtTokenUtils {
         return generateToken(subject, claims, access_token_expiration);
     }
 
+    
+    /**
+     * 生成token
+     * @param subject  用户名
+     * @param claims   
+     * @return
+     */
+    private String generateAccessToken(String subject, Map<String, Object> claims,long expiration) {
+        return generateToken(subject, claims, expiration);
+    }
+    
     /**
      * 用户所拥有的资源权限
      * @param authorities
@@ -295,7 +323,7 @@ public class JwtTokenUtils {
                 .setId(UUID.randomUUID().toString())
                 .setIssuedAt(new Date())
                 .setExpiration(generateExpirationDate(expiration))  //过期时间
-                .compressWith(CompressionCodecs.DEFLATE)
+                //.setNotBefore(now)              //系统时间之前的token都是不可以被承认的
                 .signWith(SIGNATURE_ALGORITHM, secret) //数字签名
                 .compact();
     }

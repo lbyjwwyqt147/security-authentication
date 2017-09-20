@@ -1,6 +1,7 @@
 package pers.ljy.background.jwt;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -24,12 +25,16 @@ import pers.ljy.background.share.exception.BusinessException;
 import pers.ljy.background.share.redis.RedisService;
 import pers.ljy.background.share.result.ApiResultCode;
 import pers.ljy.background.share.result.ApiResultView;
+import pers.ljy.background.share.utils.DateUtils;
 import pers.ljy.background.share.utils.SecurityReturnJson;
 
 /***
  * 集成JWT和Spring Security
  * 
  * 每次请求接口时 就会进入这里验证token 是否合法
+ * 
+ * token 如果用户一直在操作，则token 过期时间会叠加    如果超过设置的过期时间未操作  则token 失效 需要重新登录
+ * 
  * @author ljy
  *
  */
@@ -50,6 +55,9 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
 
     @Value("${jwt.tokenHead}")
     private String tokenHead;
+    
+    @Value("${jwt.expiration}")
+    private Long expiration;
 
     @Override
     protected void doFilterInternal(
@@ -60,6 +68,15 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
 	    	String authHeader = request.getHeader(this.tokenHeader);
 	        if (authHeader != null && authHeader.startsWith(tokenHead)) {
 	              final String authToken = authHeader.substring(tokenHead.length()); // The part after "Bearer-"
+	              //如果在token过期之前触发接口,我们更新token过期时间，token值不变只更新过期时间
+	              Date createTokenDate = jwtTokenUtil.getCreatedDateFromToken(authToken);  //获取token生成时间
+	              Long differSeconds = DateUtils.getDistanceSeconds(System.currentTimeMillis(), createTokenDate.getTime());
+	              boolean isExpire = expiration > differSeconds;
+	              if(isExpire){  //如果 请求接口时间在token 过期之前 则更新token过期时间
+	            	 String token = jwtTokenUtil.restTokenExpired(authToken,expiration+differSeconds);
+	            	 System.out.println(token);
+	              }
+	              System.out.println(DateUtils.format(jwtTokenUtil.getExpirationDateFromToken(authToken)));
 	              String username = jwtTokenUtil.getUsernameFromToken(authToken);
 	              Long userId = jwtTokenUtil.getUserIdFromToken(authToken);
 	              //获取当前用户在redis 中的token
@@ -73,7 +90,7 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
 
 	            		  //得到用户信息
 	            		  JWTUserDetails userDetails = (JWTUserDetails) this.userDetailsService.loadUserByUsername(username);
-
+                          
 	            		  //验证token 是否合法
 	            		  if (jwtTokenUtil.validateToken(authToken, userDetails)) {
 	            			  UsernamePasswordAuthenticationToken userAuthentication = new UsernamePasswordAuthenticationToken(

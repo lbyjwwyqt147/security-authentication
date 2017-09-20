@@ -45,13 +45,13 @@ jwt:
   # 密匙key
   secret: mySecret
   # 超时时间   单位秒
-  expiration: 3600
+  expiration: 360
   # 自定义token 前缀字符
   tokenHead: "Bearer-"
   # 超时时间   单位秒
-  access_token: 3600
+  access_token: 360
   # 刷新token时间   单位秒
-  refresh_token: 3600
+  refresh_token: 360
   route:
     authentication:
       path: auth
