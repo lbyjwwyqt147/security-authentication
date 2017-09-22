@@ -8,7 +8,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+@EnableTransactionManagement  //@EnableTransactionManagement 开启事务支持后，然后在访问数据库的Service方法上添加注解 @Transactional 便可
 @SpringBootApplication 
 public class SecurityApplication {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SecurityApplication.class);

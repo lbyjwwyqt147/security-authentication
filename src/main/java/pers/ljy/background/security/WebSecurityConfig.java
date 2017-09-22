@@ -18,6 +18,7 @@ import org.springframework.security.web.access.intercept.FilterSecurityIntercept
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.authentication.session.ConcurrentSessionControlAuthenticationStrategy;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.session.ConcurrentSessionFilter;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
 import org.springframework.security.web.session.SessionInformationExpiredStrategy;
@@ -90,7 +91,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     	// http.addFilterBefore(simpleCORSFilter, ChannelProcessingFilter.class); 跨域
 
     	 http.csrf().disable()  // 由于使用的是JWT，这里我们不需要csrf
-    	      
+    	         .csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+    	         .and()
     	         .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) // 基于token，所以不需要session  如果基于session 则表使用这段代码
     	         .and()
 		         .authorizeRequests()   //对请求进行认证
@@ -125,7 +127,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		         .permitAll()
 		         .invalidateHttpSession(true)
 		         .and()
-		         .rememberMe()//登录后记住用户，下次自动登录,数据库中必须存在名为persistent_logins的表
+		         .rememberMe()//登录后记住用户，下次自动登录,数据库中必须存在名为persistent_logins的表  不管session是否过期，用户记录将会被记保存下来
 		         .tokenValiditySeconds(1209600);
 		  http.addFilterBefore(myFilterSecurityInterceptor, FilterSecurityInterceptor.class);
 		  // 退出登录时删除session对应的cookie 
